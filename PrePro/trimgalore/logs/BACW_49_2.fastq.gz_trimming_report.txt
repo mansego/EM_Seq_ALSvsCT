@@ -1,0 +1,214 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: BACW_49_2.fastq.gz
+Trimming mode: paired-end
+Trim Galore version: 0.6.10
+Cutadapt version: 4.9
+Python version: could not detect
+Number of cores used for trimming: 8
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 9989). Second best hit was Nextera (count: 0)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+All Read 1 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases (e.g. M-bias for BS-Seq applications)
+All Read 1 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+Running FastQC on the data once trimming has completed
+Output file will be GZIP compressed
+
+
+This is cutadapt 4.9 with Python 3.12.8
+Command line parameters: -j 8 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC BACW_49_2.fastq.gz
+Processing single-end reads on 8 cores ...
+Finished in 2633.842 s (9.843 µs/read; 6.10 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:             267,584,703
+Reads with adapters:               138,705,333 (51.8%)
+Reads written (passing filters):   267,584,703 (100.0%)
+
+Total basepairs processed: 40,137,705,450 bp
+Quality-trimmed:             131,940,841 bp (0.3%)
+Total written (filtered):  39,754,520,094 bp (99.0%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 138705333 times
+
+Minimum overlap: 1
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 57.8%
+  C: 16.1%
+  G: 0.9%
+  T: 25.1%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	131026028	66896175.8	0	131026028
+2	689234	16724043.9	0	689234
+3	596219	4181011.0	0	596219
+4	500159	1045252.7	0	500159
+5	473488	261313.2	0	473488
+6	411550	65328.3	0	411550
+7	425638	16332.1	0	425638
+8	444592	4083.0	0	444592
+9	298284	1020.8	0	295447 2837
+10	344881	255.2	1	297955 46926
+11	256630	63.8	1	217054 39576
+12	217024	15.9	1	181286 35738
+13	167369	4.0	1	141220 26149
+14	183961	4.0	1	151882 32079
+15	169827	4.0	1	143532 26295
+16	196811	4.0	1	166180 30631
+17	224241	4.0	1	190077 34164
+18	121663	4.0	1	104097 17566
+19	129520	4.0	1	109563 19957
+20	89352	4.0	1	76408 12944
+21	59184	4.0	1	51206 7978
+22	62751	4.0	1	54275 8476
+23	56007	4.0	1	48269 7738
+24	64312	4.0	1	53858 10454
+25	76223	4.0	1	67092 9131
+26	55921	4.0	1	47623 8298
+27	67353	4.0	1	57812 9541
+28	87776	4.0	1	77062 10714
+29	65338	4.0	1	57697 7641
+30	60078	4.0	1	53058 7020
+31	43589	4.0	1	38369 5220
+32	48203	4.0	1	42253 5950
+33	37731	4.0	1	33380 4351
+34	32186	4.0	1	28013 4173
+35	45506	4.0	1	39645 5861
+36	35052	4.0	1	31063 3989
+37	40459	4.0	1	36535 3924
+38	33962	4.0	1	30352 3610
+39	30897	4.0	1	27345 3552
+40	42955	4.0	1	38637 4318
+41	28571	4.0	1	25479 3092
+42	31969	4.0	1	28438 3531
+43	25563	4.0	1	22720 2843
+44	26502	4.0	1	23749 2753
+45	25856	4.0	1	22882 2974
+46	26497	4.0	1	23597 2900
+47	27275	4.0	1	24787 2488
+48	26441	4.0	1	23959 2482
+49	28484	4.0	1	25460 3024
+50	25222	4.0	1	23078 2144
+51	23192	4.0	1	20916 2276
+52	19110	4.0	1	17352 1758
+53	15165	4.0	1	13782 1383
+54	15001	4.0	1	13594 1407
+55	11427	4.0	1	10416 1011
+56	14375	4.0	1	13025 1350
+57	22496	4.0	1	20388 2108
+58	19025	4.0	1	17257 1768
+59	19430	4.0	1	17891 1539
+60	20118	4.0	1	18490 1628
+61	12177	4.0	1	11212 965
+62	9186	4.0	1	8334 852
+63	16223	4.0	1	14981 1242
+64	6592	4.0	1	5993 599
+65	6119	4.0	1	5632 487
+66	6489	4.0	1	5826 663
+67	9923	4.0	1	9159 764
+68	11939	4.0	1	11073 866
+69	12280	4.0	1	11302 978
+70	13874	4.0	1	12804 1070
+71	10973	4.0	1	10205 768
+72	8560	4.0	1	7819 741
+73	10658	4.0	1	9907 751
+74	7767	4.0	1	7203 564
+75	6000	4.0	1	5491 509
+76	1996	4.0	1	1812 184
+77	3216	4.0	1	2972 244
+78	4719	4.0	1	4393 326
+79	5408	4.0	1	5032 376
+80	5960	4.0	1	5532 428
+81	5351	4.0	1	4979 372
+82	4644	4.0	1	4315 329
+83	4157	4.0	1	3856 301
+84	3733	4.0	1	3461 272
+85	3714	4.0	1	3466 248
+86	3499	4.0	1	3263 236
+87	3143	4.0	1	2932 211
+88	3156	4.0	1	2937 219
+89	3287	4.0	1	3080 207
+90	3244	4.0	1	3025 219
+91	2831	4.0	1	2659 172
+92	2421	4.0	1	2257 164
+93	2052	4.0	1	1921 131
+94	1860	4.0	1	1720 140
+95	1531	4.0	1	1423 108
+96	1430	4.0	1	1299 131
+97	1257	4.0	1	1170 87
+98	1210	4.0	1	1134 76
+99	1227	4.0	1	1118 109
+100	1178	4.0	1	1091 87
+101	971	4.0	1	903 68
+102	820	4.0	1	738 82
+103	721	4.0	1	652 69
+104	565	4.0	1	507 58
+105	467	4.0	1	422 45
+106	445	4.0	1	412 33
+107	382	4.0	1	330 52
+108	288	4.0	1	262 26
+109	309	4.0	1	275 34
+110	240	4.0	1	207 33
+111	237	4.0	1	202 35
+112	203	4.0	1	170 33
+113	163	4.0	1	138 25
+114	152	4.0	1	119 33
+115	129	4.0	1	110 19
+116	105	4.0	1	80 25
+117	97	4.0	1	77 20
+118	218	4.0	1	187 31
+119	8126	4.0	1	7814 312
+120	796	4.0	1	753 43
+121	128	4.0	1	106 22
+122	67	4.0	1	53 14
+123	47	4.0	1	35 12
+124	54	4.0	1	38 16
+125	54	4.0	1	39 15
+126	51	4.0	1	40 11
+127	43	4.0	1	28 15
+128	47	4.0	1	35 12
+129	43	4.0	1	31 12
+130	43	4.0	1	29 14
+131	26	4.0	1	22 4
+132	48	4.0	1	36 12
+133	23	4.0	1	13 10
+134	26	4.0	1	19 7
+135	37	4.0	1	27 10
+136	35	4.0	1	19 16
+137	26	4.0	1	15 11
+138	31	4.0	1	18 13
+139	39	4.0	1	14 25
+140	32	4.0	1	16 16
+141	22	4.0	1	4 18
+142	37	4.0	1	8 29
+143	39	4.0	1	8 31
+144	34	4.0	1	5 29
+145	55	4.0	1	8 47
+146	67	4.0	1	15 52
+147	38	4.0	1	2 36
+148	17	4.0	1	6 11
+149	8	4.0	1	2 6
+150	25	4.0	1	0 25
+
+RUN STATISTICS FOR INPUT FILE: BACW_49_2.fastq.gz
+=============================================
+267584703 sequences processed in total
+
+Total number of sequences analysed for the sequence pair length validation: 267584703
+
+Number of sequence pairs removed because at least one read was shorter than the length cutoff (20 bp): 96719 (0.04%)

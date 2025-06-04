@@ -1,0 +1,16 @@
+Sample	Methylated CpG	Methylated CHG	Methylated CHH
+BACW_42_1_val_1	68.8	0.3	0.3
+BACW_44_1_val_1	68.9	0.3	0.3
+BACW_45_1_val_1	68.9	0.4	0.4
+BACW_47_1_val_1	67.9	0.3	0.3
+BACW_48_1_val_1	67.0	0.5	0.4
+BACW_50_1_val_1	68.2	0.3	0.3
+BACW_52_1_val_1	67.9	0.3	0.3
+BACW_53_1_val_1	68.1	0.3	0.3
+BACW_55_1_val_1	67.3	0.5	0.5
+BACW_56_1_val_1	67.4	0.6	0.6
+BACW_57_1_val_1	66.5	0.4	0.4
+BACW_58_1_val_1	67.5	0.4	0.4
+BACW_59_1_val_1	67.1	0.5	0.5
+BACW_61_1_val_1	68.4	0.4	0.4
+BACW_64_1_val_1	69.3	0.8	0.8

@@ -1,0 +1,7 @@
+[2025-03-21 11:13:04,468] multiqc.core.file_search                           [INFO   ]  Search path: /data/scratch/NAVA1/ml
+[2025-03-21 11:13:38,084] multiqc.modules.preseq.preseq                      [INFO   ]  Found 2 reports
+[2025-03-21 11:13:38,351] multiqc.modules.bismark.bismark                    [INFO   ]  Found 15 alignment reports
+[2025-03-21 11:13:38,392] multiqc.modules.bismark.bismark                    [INFO   ]  Found 13 dedup reports
+[2025-03-21 11:13:38,407] multiqc.modules.bismark.bismark                    [INFO   ]  Found 15 methextract reports
+[2025-03-21 11:13:38,611] multiqc.modules.cutadapt.cutadapt                  [INFO   ]  Found 28 reports
+[2025-03-21 11:13:39,998] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 56 reports

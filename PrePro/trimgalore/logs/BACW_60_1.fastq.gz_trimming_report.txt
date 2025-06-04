@@ -1,0 +1,211 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: BACW_60_1.fastq.gz
+Trimming mode: paired-end
+Trim Galore version: 0.6.10
+Cutadapt version: 4.9
+Python version: could not detect
+Number of cores used for trimming: 8
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 13100). Second best hit was Nextera (count: 0)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+All Read 1 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases (e.g. M-bias for BS-Seq applications)
+All Read 1 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+Running FastQC on the data once trimming has completed
+Output file will be GZIP compressed
+
+
+This is cutadapt 4.9 with Python 3.12.8
+Command line parameters: -j 8 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC BACW_60_1.fastq.gz
+Processing single-end reads on 8 cores ...
+Finished in 2809.861 s (13.860 µs/read; 4.33 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:             202,725,975
+Reads with adapters:                77,930,389 (38.4%)
+Reads written (passing filters):   202,725,975 (100.0%)
+
+Total basepairs processed: 30,408,896,250 bp
+Quality-trimmed:              43,975,249 bp (0.1%)
+Total written (filtered):  30,163,323,999 bp (99.2%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 77930389 times
+
+Minimum overlap: 1
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 32.3%
+  C: 0.3%
+  G: 19.7%
+  T: 47.7%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	52068392	50681493.8	0	52068392
+2	13544355	12670373.4	0	13544355
+3	4836201	3167593.4	0	4836201
+4	2026170	791898.3	0	2026170
+5	447357	197974.6	0	447357
+6	375014	49493.6	0	375014
+7	367926	12373.4	0	367926
+8	377471	3093.4	0	377471
+9	362579	773.3	0	358554 4025
+10	302419	193.3	1	274032 28387
+11	273318	48.3	1	236050 37268
+12	202219	12.1	1	182114 20105
+13	157693	3.0	1	143906 13787
+14	169192	3.0	1	147568 21624
+15	176030	3.0	1	159697 16333
+16	214713	3.0	1	187489 27224
+17	205105	3.0	1	181909 23196
+18	145886	3.0	1	133744 12142
+19	101139	3.0	1	92179 8960
+20	84791	3.0	1	77213 7578
+21	67919	3.0	1	61687 6232
+22	56052	3.0	1	51565 4487
+23	53848	3.0	1	48706 5142
+24	55052	3.0	1	47348 7704
+25	52395	3.0	1	47440 4955
+26	60673	3.0	1	55380 5293
+27	80623	3.0	1	73638 6985
+28	80174	3.0	1	73968 6206
+29	72649	3.0	1	64982 7667
+30	50824	3.0	1	47338 3486
+31	37535	3.0	1	34730 2805
+32	34318	3.0	1	31763 2555
+33	32519	3.0	1	29452 3067
+34	29302	3.0	1	27164 2138
+35	32825	3.0	1	29467 3358
+36	25940	3.0	1	24047 1893
+37	28088	3.0	1	26240 1848
+38	39657	3.0	1	35490 4167
+39	35394	3.0	1	32988 2406
+40	29622	3.0	1	27603 2019
+41	28539	3.0	1	26337 2202
+42	25253	3.0	1	23347 1906
+43	29208	3.0	1	24642 4566
+44	19120	3.0	1	17133 1987
+45	32741	3.0	1	30228 2513
+46	12539	3.0	1	11357 1182
+47	23279	3.0	1	21621 1658
+48	101586	3.0	1	97034 4552
+49	19682	3.0	1	18229 1453
+50	25015	3.0	1	23645 1370
+51	25433	3.0	1	24044 1389
+52	7518	3.0	1	6922 596
+53	2707	3.0	1	2494 213
+54	20957	3.0	1	20290 667
+55	5509	3.0	1	5249 260
+56	1836	3.0	1	1652 184
+57	7496	3.0	1	7239 257
+58	1429	3.0	1	1240 189
+59	7842	3.0	1	7383 459
+60	1761	3.0	1	1596 165
+61	910	3.0	1	780 130
+62	5284	3.0	1	5036 248
+63	3683	3.0	1	3567 116
+64	509	3.0	1	426 83
+65	2285	3.0	1	2099 186
+66	4676	3.0	1	4466 210
+67	2012	3.0	1	1871 141
+68	7305	3.0	1	6895 410
+69	10565	3.0	1	9957 608
+70	17821	3.0	1	17004 817
+71	6166	3.0	1	5714 452
+72	1049	3.0	1	903 146
+73	466	3.0	1	400 66
+74	1427	3.0	1	1323 104
+75	2577	3.0	1	2447 130
+76	3106	3.0	1	2933 173
+77	3487	3.0	1	3301 186
+78	3607	3.0	1	3408 199
+79	4011	3.0	1	3789 222
+80	4207	3.0	1	3984 223
+81	3805	3.0	1	3609 196
+82	3096	3.0	1	2921 175
+83	2664	3.0	1	2500 164
+84	2509	3.0	1	2361 148
+85	2427	3.0	1	2253 174
+86	2215	3.0	1	2077 138
+87	2175	3.0	1	2024 151
+88	2233	3.0	1	2098 135
+89	2246	3.0	1	2122 124
+90	2199	3.0	1	2049 150
+91	1911	3.0	1	1786 125
+92	1581	3.0	1	1456 125
+93	1347	3.0	1	1257 90
+94	1165	3.0	1	1063 102
+95	1122	3.0	1	1037 85
+96	954	3.0	1	872 82
+97	932	3.0	1	854 78
+98	841	3.0	1	769 72
+99	816	3.0	1	750 66
+100	784	3.0	1	710 74
+101	764	3.0	1	699 65
+102	589	3.0	1	525 64
+103	478	3.0	1	420 58
+104	414	3.0	1	364 50
+105	366	3.0	1	313 53
+106	349	3.0	1	292 57
+107	271	3.0	1	233 38
+108	253	3.0	1	211 42
+109	221	3.0	1	172 49
+110	215	3.0	1	165 50
+111	175	3.0	1	144 31
+112	171	3.0	1	134 37
+113	157	3.0	1	118 39
+114	139	3.0	1	94 45
+115	114	3.0	1	79 35
+116	113	3.0	1	75 38
+117	115	3.0	1	67 48
+118	183	3.0	1	128 55
+119	5916	3.0	1	5787 129
+120	943	3.0	1	891 52
+121	104	3.0	1	89 15
+122	103	3.0	1	58 45
+123	58	3.0	1	33 25
+124	69	3.0	1	33 36
+125	63	3.0	1	28 35
+126	77	3.0	1	29 48
+127	63	3.0	1	32 31
+128	72	3.0	1	28 44
+129	61	3.0	1	28 33
+130	68	3.0	1	26 42
+131	51	3.0	1	15 36
+132	67	3.0	1	16 51
+133	51	3.0	1	12 39
+134	64	3.0	1	21 43
+135	64	3.0	1	17 47
+136	54	3.0	1	16 38
+137	54	3.0	1	13 41
+138	59	3.0	1	17 42
+139	49	3.0	1	3 46
+140	46	3.0	1	7 39
+141	53	3.0	1	2 51
+142	63	3.0	1	4 59
+143	57	3.0	1	5 52
+144	65	3.0	1	6 59
+145	70	3.0	1	3 67
+146	84	3.0	1	11 73
+147	54	3.0	1	1 53
+148	54	3.0	1	4 50
+149	49	3.0	1	0 49
+150	1593	3.0	1	1 1592
+
+RUN STATISTICS FOR INPUT FILE: BACW_60_1.fastq.gz
+=============================================
+202725975 sequences processed in total
+

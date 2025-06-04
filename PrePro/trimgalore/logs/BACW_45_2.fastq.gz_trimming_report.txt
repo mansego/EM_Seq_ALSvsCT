@@ -1,0 +1,214 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: BACW_45_2.fastq.gz
+Trimming mode: paired-end
+Trim Galore version: 0.6.10
+Cutadapt version: 4.9
+Python version: could not detect
+Number of cores used for trimming: 8
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 15495). Second best hit was Nextera (count: 0)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+All Read 1 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases (e.g. M-bias for BS-Seq applications)
+All Read 1 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+Running FastQC on the data once trimming has completed
+Output file will be GZIP compressed
+
+
+This is cutadapt 4.9 with Python 3.12.9
+Command line parameters: -j 8 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC BACW_45_2.fastq.gz
+Processing single-end reads on 8 cores ...
+Finished in 1257.732 s (5.257 µs/read; 11.41 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:             239,230,044
+Reads with adapters:               126,773,906 (53.0%)
+Reads written (passing filters):   239,230,044 (100.0%)
+
+Total basepairs processed: 35,884,506,600 bp
+Quality-trimmed:             112,005,357 bp (0.3%)
+Total written (filtered):  35,491,920,423 bp (98.9%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 126773906 times
+
+Minimum overlap: 1
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 58.3%
+  C: 16.7%
+  G: 1.1%
+  T: 23.9%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	116369497	59807511.0	0	116369497
+2	872674	14951877.8	0	872674
+3	779289	3737969.4	0	779289
+4	663846	934492.4	0	663846
+5	642272	233623.1	0	642272
+6	558936	58405.8	0	558936
+7	559079	14601.4	0	559079
+8	602685	3650.4	0	602685
+9	416268	912.6	0	412916 3352
+10	469957	228.1	1	409008 60949
+11	373793	57.0	1	316485 57308
+12	312004	14.3	1	262665 49339
+13	242143	3.6	1	204310 37833
+14	255119	3.6	1	211928 43191
+15	234465	3.6	1	199122 35343
+16	271537	3.6	1	229544 41993
+17	307315	3.6	1	261984 45331
+18	164233	3.6	1	140917 23316
+19	184335	3.6	1	157255 27080
+20	116700	3.6	1	100296 16404
+21	80239	3.6	1	69591 10648
+22	86395	3.6	1	75132 11263
+23	76158	3.6	1	65555 10603
+24	90497	3.6	1	76430 14067
+25	91886	3.6	1	81145 10741
+26	73687	3.6	1	63481 10206
+27	103281	3.6	1	89232 14049
+28	118541	3.6	1	104586 13955
+29	95710	3.6	1	84442 11268
+30	79259	3.6	1	70359 8900
+31	64886	3.6	1	56912 7974
+32	58824	3.6	1	51999 6825
+33	52660	3.6	1	46658 6002
+34	54979	3.6	1	48097 6882
+35	47360	3.6	1	41348 6012
+36	43488	3.6	1	38670 4818
+37	52367	3.6	1	46878 5489
+38	60635	3.6	1	54243 6392
+39	67603	3.6	1	60730 6873
+40	46046	3.6	1	41344 4702
+41	37672	3.6	1	33678 3994
+42	42491	3.6	1	38122 4369
+43	35976	3.6	1	32292 3684
+44	34998	3.6	1	31448 3550
+45	34359	3.6	1	30478 3881
+46	36571	3.6	1	32709 3862
+47	35963	3.6	1	32840 3123
+48	37424	3.6	1	33942 3482
+49	40074	3.6	1	35976 4098
+50	34510	3.6	1	31600 2910
+51	31210	3.6	1	28272 2938
+52	25780	3.6	1	23551 2229
+53	21183	3.6	1	19366 1817
+54	20277	3.6	1	18522 1755
+55	16178	3.6	1	14750 1428
+56	19353	3.6	1	17579 1774
+57	30477	3.6	1	27805 2672
+58	25869	3.6	1	23562 2307
+59	27777	3.6	1	25674 2103
+60	26740	3.6	1	24601 2139
+61	16878	3.6	1	15576 1302
+62	12678	3.6	1	11530 1148
+63	20738	3.6	1	19275 1463
+64	8789	3.6	1	8000 789
+65	8251	3.6	1	7605 646
+66	8313	3.6	1	7595 718
+67	12886	3.6	1	11895 991
+68	16849	3.6	1	15668 1181
+69	17062	3.6	1	15812 1250
+70	18859	3.6	1	17490 1369
+71	14431	3.6	1	13399 1032
+72	11116	3.6	1	10232 884
+73	13492	3.6	1	12611 881
+74	10163	3.6	1	9458 705
+75	7654	3.6	1	7120 534
+76	2590	3.6	1	2362 228
+77	3981	3.6	1	3682 299
+78	5813	3.6	1	5467 346
+79	7023	3.6	1	6546 477
+80	7557	3.6	1	7107 450
+81	6852	3.6	1	6402 450
+82	5692	3.6	1	5338 354
+83	4911	3.6	1	4598 313
+84	4577	3.6	1	4255 322
+85	4367	3.6	1	4081 286
+86	4140	3.6	1	3876 264
+87	3934	3.6	1	3653 281
+88	4040	3.6	1	3783 257
+89	4165	3.6	1	3924 241
+90	4081	3.6	1	3819 262
+91	3592	3.6	1	3367 225
+92	3094	3.6	1	2910 184
+93	2475	3.6	1	2338 137
+94	2207	3.6	1	2066 141
+95	1985	3.6	1	1860 125
+96	1800	3.6	1	1679 121
+97	1726	3.6	1	1611 115
+98	1573	3.6	1	1474 99
+99	1636	3.6	1	1523 113
+100	1641	3.6	1	1543 98
+101	1418	3.6	1	1331 87
+102	1139	3.6	1	1059 80
+103	921	3.6	1	860 61
+104	768	3.6	1	717 51
+105	673	3.6	1	613 60
+106	580	3.6	1	523 57
+107	558	3.6	1	515 43
+108	465	3.6	1	424 41
+109	395	3.6	1	352 43
+110	377	3.6	1	342 35
+111	335	3.6	1	300 35
+112	315	3.6	1	282 33
+113	235	3.6	1	217 18
+114	214	3.6	1	184 30
+115	186	3.6	1	156 30
+116	163	3.6	1	136 27
+117	176	3.6	1	140 36
+118	290	3.6	1	252 38
+119	12283	3.6	1	11835 448
+120	1391	3.6	1	1318 73
+121	177	3.6	1	158 19
+122	133	3.6	1	107 26
+123	75	3.6	1	61 14
+124	96	3.6	1	84 12
+125	65	3.6	1	50 15
+126	92	3.6	1	76 16
+127	74	3.6	1	57 17
+128	67	3.6	1	56 11
+129	64	3.6	1	51 13
+130	77	3.6	1	64 13
+131	48	3.6	1	31 17
+132	56	3.6	1	47 9
+133	41	3.6	1	28 13
+134	56	3.6	1	42 14
+135	55	3.6	1	44 11
+136	53	3.6	1	34 19
+137	40	3.6	1	30 10
+138	50	3.6	1	37 13
+139	40	3.6	1	24 16
+140	53	3.6	1	30 23
+141	40	3.6	1	22 18
+142	40	3.6	1	15 25
+143	38	3.6	1	8 30
+144	48	3.6	1	8 40
+145	62	3.6	1	18 44
+146	85	3.6	1	27 58
+147	57	3.6	1	14 43
+148	38	3.6	1	15 23
+149	18	3.6	1	2 16
+150	45	3.6	1	11 34
+
+RUN STATISTICS FOR INPUT FILE: BACW_45_2.fastq.gz
+=============================================
+239230044 sequences processed in total
+
+Total number of sequences analysed for the sequence pair length validation: 239230044
+
+Number of sequence pairs removed because at least one read was shorter than the length cutoff (20 bp): 98121 (0.04%)

@@ -1,0 +1,214 @@
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: BACW_51_2.fastq.gz
+Trimming mode: paired-end
+Trim Galore version: 0.6.10
+Cutadapt version: 4.9
+Python version: could not detect
+Number of cores used for trimming: 8
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Using Illumina adapter for trimming (count: 16734). Second best hit was smallRNA (count: 0)
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+All Read 1 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 5' end to avoid poor qualities or biases (e.g. M-bias for BS-Seq applications)
+All Read 1 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+All Read 2 sequences will be trimmed by 10 bp from their 3' end to avoid poor qualities or biases
+Running FastQC on the data once trimming has completed
+Output file will be GZIP compressed
+
+
+This is cutadapt 4.9 with Python 3.12.8
+Command line parameters: -j 8 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC BACW_51_2.fastq.gz
+Processing single-end reads on 8 cores ...
+Finished in 1204.602 s (5.447 µs/read; 11.02 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:             221,165,351
+Reads with adapters:               114,801,895 (51.9%)
+Reads written (passing filters):   221,165,351 (100.0%)
+
+Total basepairs processed: 33,174,802,650 bp
+Quality-trimmed:             159,623,148 bp (0.5%)
+Total written (filtered):  32,735,824,686 bp (98.7%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 114801895 times
+
+Minimum overlap: 1
+No. of allowed errors:
+1-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 57.3%
+  C: 16.6%
+  G: 1.1%
+  T: 25.1%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	105615753	55291337.8	0	105615753
+2	763395	13822834.4	0	763395
+3	637397	3455708.6	0	637397
+4	526407	863927.2	0	526407
+5	500939	215981.8	0	500939
+6	429641	53995.4	0	429641
+7	445602	13498.9	0	445602
+8	471669	3374.7	0	471669
+9	331956	843.7	0	329972 1984
+10	387817	210.9	1	337734 50083
+11	296016	52.7	1	252269 43747
+12	257783	13.2	1	217086 40697
+13	205559	3.3	1	174351 31208
+14	227474	3.3	1	189463 38011
+15	215768	3.3	1	183596 32172
+16	243750	3.3	1	207417 36333
+17	280238	3.3	1	239358 40880
+18	148597	3.3	1	127888 20709
+19	179103	3.3	1	152970 26133
+20	104649	3.3	1	89696 14953
+21	76077	3.3	1	66028 10049
+22	82612	3.3	1	71666 10946
+23	73346	3.3	1	62768 10578
+24	100500	3.3	1	84986 15514
+25	89591	3.3	1	79344 10247
+26	68802	3.3	1	58954 9848
+27	90734	3.3	1	78604 12130
+28	118664	3.3	1	104790 13874
+29	87369	3.3	1	77357 10012
+30	82259	3.3	1	72984 9275
+31	53712	3.3	1	47331 6381
+32	60988	3.3	1	53564 7424
+33	47210	3.3	1	41801 5409
+34	45877	3.3	1	39923 5954
+35	41567	3.3	1	36958 4609
+36	46966	3.3	1	41024 5942
+37	55976	3.3	1	49461 6515
+38	60928	3.3	1	54790 6138
+39	54868	3.3	1	49190 5678
+40	46050	3.3	1	40807 5243
+41	41984	3.3	1	37570 4414
+42	38688	3.3	1	34496 4192
+43	32325	3.3	1	28825 3500
+44	32858	3.3	1	29176 3682
+45	33401	3.3	1	29554 3847
+46	35892	3.3	1	31904 3988
+47	36827	3.3	1	33429 3398
+48	37011	3.3	1	33382 3629
+49	38994	3.3	1	34756 4238
+50	33150	3.3	1	30207 2943
+51	29926	3.3	1	26770 3156
+52	24826	3.3	1	22267 2559
+53	19902	3.3	1	17948 1954
+54	20449	3.3	1	18218 2231
+55	16840	3.3	1	15181 1659
+56	20585	3.3	1	18389 2196
+57	35325	3.3	1	31830 3495
+58	27533	3.3	1	24980 2553
+59	29646	3.3	1	27185 2461
+60	30395	3.3	1	27563 2832
+61	18333	3.3	1	16662 1671
+62	13837	3.3	1	12397 1440
+63	24815	3.3	1	22568 2247
+64	10299	3.3	1	9134 1165
+65	9121	3.3	1	8233 888
+66	9858	3.3	1	8796 1062
+67	15639	3.3	1	14127 1512
+68	19464	3.3	1	17837 1627
+69	19757	3.3	1	18057 1700
+70	22587	3.3	1	20674 1913
+71	17730	3.3	1	16235 1495
+72	13465	3.3	1	12226 1239
+73	17472	3.3	1	16070 1402
+74	12802	3.3	1	11650 1152
+75	9997	3.3	1	9091 906
+76	3576	3.3	1	3167 409
+77	5308	3.3	1	4867 441
+78	8145	3.3	1	7507 638
+79	9590	3.3	1	8747 843
+80	11077	3.3	1	10171 906
+81	10267	3.3	1	9404 863
+82	8691	3.3	1	7943 748
+83	7657	3.3	1	7001 656
+84	7369	3.3	1	6686 683
+85	7278	3.3	1	6596 682
+86	6807	3.3	1	6160 647
+87	6646	3.3	1	6044 602
+88	6752	3.3	1	6091 661
+89	7135	3.3	1	6498 637
+90	7239	3.3	1	6646 593
+91	6517	3.3	1	5938 579
+92	5747	3.3	1	5201 546
+93	4866	3.3	1	4368 498
+94	4334	3.3	1	3890 444
+95	3874	3.3	1	3457 417
+96	3771	3.3	1	3352 419
+97	3475	3.3	1	3125 350
+98	3466	3.3	1	3099 367
+99	3617	3.3	1	3239 378
+100	3821	3.3	1	3490 331
+101	3295	3.3	1	2957 338
+102	2617	3.3	1	2363 254
+103	2273	3.3	1	1978 295
+104	1951	3.3	1	1705 246
+105	1761	3.3	1	1525 236
+106	1688	3.3	1	1450 238
+107	1495	3.3	1	1279 216
+108	1403	3.3	1	1183 220
+109	1290	3.3	1	1103 187
+110	1241	3.3	1	1057 184
+111	1097	3.3	1	930 167
+112	953	3.3	1	802 151
+113	858	3.3	1	700 158
+114	756	3.3	1	579 177
+115	695	3.3	1	543 152
+116	667	3.3	1	535 132
+117	705	3.3	1	552 153
+118	1651	3.3	1	1421 230
+119	94355	3.3	1	91073 3282
+120	13725	3.3	1	13162 563
+121	1138	3.3	1	1013 125
+122	557	3.3	1	464 93
+123	353	3.3	1	280 73
+124	372	3.3	1	285 87
+125	313	3.3	1	242 71
+126	325	3.3	1	244 81
+127	239	3.3	1	177 62
+128	240	3.3	1	183 57
+129	194	3.3	1	152 42
+130	181	3.3	1	141 40
+131	136	3.3	1	120 16
+132	117	3.3	1	97 20
+133	102	3.3	1	83 19
+134	94	3.3	1	70 24
+135	127	3.3	1	104 23
+136	75	3.3	1	56 19
+137	62	3.3	1	43 19
+138	48	3.3	1	33 15
+139	35	3.3	1	25 10
+140	44	3.3	1	24 20
+141	27	3.3	1	19 8
+142	32	3.3	1	13 19
+143	38	3.3	1	15 23
+144	25	3.3	1	7 18
+145	29	3.3	1	10 19
+146	40	3.3	1	8 32
+147	21	3.3	1	5 16
+148	14	3.3	1	3 11
+149	13	3.3	1	2 11
+150	61	3.3	1	26 35
+
+RUN STATISTICS FOR INPUT FILE: BACW_51_2.fastq.gz
+=============================================
+221165351 sequences processed in total
+
+Total number of sequences analysed for the sequence pair length validation: 221165351
+
+Number of sequence pairs removed because at least one read was shorter than the length cutoff (20 bp): 337651 (0.15%)

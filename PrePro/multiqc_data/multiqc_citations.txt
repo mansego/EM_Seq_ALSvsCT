@@ -1,0 +1,5 @@
+10.1093/bioinformatics/btw354                      # MultiQC
+10.1038/nmeth.2375                                 # preseq
+10.1093/bioinformatics/btr167                      # bismark
+10.14806/ej.17.1.200                               # cutadapt
+

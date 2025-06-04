@@ -1,0 +1,64 @@
+nextflow run main.nf --input ./data/samplesheet1.csv --outdir testing_miseq --genome GRCh38 -profile singularity -c ./data/hpc.config -resume
+nextflow run main.nf -profile test,singularity --outdir testing2 -resume
+
+
+/media/ml/mydisk/cfNOME/references/phix_index
+
+#mamba create -n methylation_env -c bioconda fastq_screen bismark bowtie2
+
+cd /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/fastq_screen
+
+fastq_screen --bisulfite --get_genome
+
+fastq_screen --bisulfite --conf FastQ_Screen_Genomes_Bisulfite/fastq_screen.conf /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/data/241122_A00902_B_L1-2_BACW-42_R1.fastq.gz /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/data/241122_A00902_B_L1-2_BACW-42_R2.fastq.gz
+
+
+
+        
+################33
+
+#mamba create -n bbtools -c bioconda -c conda-forge bbmap
+conda activate bbtools
+
+PHIX=/media/ml/mydisk/cfNOME/references/phix.fa
+echo $PHIX
+
+bbduk.sh threads=4 \
+ ref=$PHIX \
+ in1=/media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/data/241122_A00902_B_L1-2_BACW-42_R1.fastq.gz \ 
+ in2=/media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/data/241122_A00902_B_L1-2_BACW-42_R2.fastq.gz \
+ out=BACW_42.phix_R1.fastq.gz out2=BACW_42.phix_R2.fastq.gz \
+ stats=BACW_42.Phix_stats.txt
+ 
+######
+
+#mamba create -n kraken2 -c bioconda kraken2
+
+kraken2 --db /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/kraken2/k2_standard_08gb_20241228 \
+  --threads 4 \
+  --output BAWC_42.kraken2.out \
+  --report BAWC_42.kraken2_report.txt \
+  --minimum-base-quality 20 \
+  --paired \
+  --gzip-compressed \
+  /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/data/241122_A00902_B_L1-2_BACW-42_R*.fastq.gz 
+  
+  
+  
+  ###########
+  
+  bowtie2-build phiX.fasta phiX
+ 
+bowtie2 -x phiX -1 /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/data/241122_A00902_B_L1-2_BACW-42_R1.fastq.gz  -2 /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/real/data/241122_A00902_B_L1-2_BACW-42_R2.fastq.gz  | samtools view -bS - > phiX_PE.bam
+
+samtools flagstat phiX_PE.bam
+
+
+XXXXX + 0 mapped (YY.YY% : N/A)
+  
+  
+  
+  
+  
+  
+  
