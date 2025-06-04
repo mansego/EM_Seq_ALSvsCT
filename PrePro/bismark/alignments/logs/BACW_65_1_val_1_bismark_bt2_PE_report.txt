@@ -1,0 +1,42 @@
+Bismark report for: BACW_65_BFPD_37_1_val_1.fq.gz and BACW_65_BFPD_37_2_val_2.fq.gz (version: v0.24.2)
+Bismark was run with Bowtie 2 against the bisulfite genome of /data/scratch/NAVA1/JAJ/work/stage-5d33ebe6-880a-47a7-8980-50d840e97d41/27/364f96dc95879ce429813f7040e8d3/BismarkIndex/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 1000
+Option '--directional' specified (default mode): alignments to complementary strands (CTOT, CTOB) were ignored (i.e. not performed)
+
+Final Alignment report
+======================
+Sequence pairs analysed in total:	215769425
+Number of paired-end alignments with a unique best hit:	174616644
+Mapping efficiency:	80.9% 
+Sequence pairs with no alignments under any condition:	30411428
+Sequence pairs did not map uniquely:	10741353
+Sequence pairs which were discarded because genomic sequence could not be extracted:	78
+
+Number of sequence pairs with unique best (first) alignment came from the bowtie output:
+CT/GA/CT:	87294312	((converted) top strand)
+GA/CT/CT:	0	(complementary to (converted) top strand)
+GA/CT/GA:	0	(complementary to (converted) bottom strand)
+CT/GA/GA:	87322254	((converted) bottom strand)
+
+Number of alignments to (merely theoretical) complementary strands being rejected in total:	0
+
+Final Cytosine Methylation Report
+=================================
+Total number of C's analysed:	9872424080
+
+Total methylated C's in CpG context:	360783214
+Total methylated C's in CHG context:	8946236
+Total methylated C's in CHH context:	27960696
+Total methylated C's in Unknown context:	22563
+
+Total unmethylated C's in CpG context:	149344968
+Total unmethylated C's in CHG context:	2174424615
+Total unmethylated C's in CHH context:	7150964351
+Total unmethylated C's in Unknown context:	1921246
+
+C methylated in CpG context:	70.7%
+C methylated in CHG context:	0.4%
+C methylated in CHH context:	0.4%
+C methylated in Unknown context (CN or CHN):	1.2%
+
+
+Bismark completed in 1d 9h 16m 10s

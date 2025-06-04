@@ -1,0 +1,42 @@
+Bismark report for: BACW_62_1_val_1.fq.gz and BACW_62_2_val_2.fq.gz (version: v0.24.2)
+Bismark was run with Bowtie 2 against the bisulfite genome of /data/scratch/NAVA1/methylseq_3.0.0_ml/work/stage-112c7ad1-28c8-4f4e-93a2-1f893eaa87d9/35/2394f7487cb0a3bfa1f7181026d390/BismarkIndex/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 1000
+Option '--directional' specified (default mode): alignments to complementary strands (CTOT, CTOB) were ignored (i.e. not performed)
+
+Final Alignment report
+======================
+Sequence pairs analysed in total:	198924931
+Number of paired-end alignments with a unique best hit:	159317490
+Mapping efficiency:	80.1% 
+Sequence pairs with no alignments under any condition:	29092608
+Sequence pairs did not map uniquely:	10514833
+Sequence pairs which were discarded because genomic sequence could not be extracted:	61
+
+Number of sequence pairs with unique best (first) alignment came from the bowtie output:
+CT/GA/CT:	79650320	((converted) top strand)
+GA/CT/CT:	0	(complementary to (converted) top strand)
+GA/CT/GA:	0	(complementary to (converted) bottom strand)
+CT/GA/GA:	79667109	((converted) bottom strand)
+
+Number of alignments to (merely theoretical) complementary strands being rejected in total:	0
+
+Final Cytosine Methylation Report
+=================================
+Total number of C's analysed:	8983774449
+
+Total methylated C's in CpG context:	331998447
+Total methylated C's in CHG context:	8639245
+Total methylated C's in CHH context:	26701483
+Total methylated C's in Unknown context:	21109
+
+Total unmethylated C's in CpG context:	133521309
+Total unmethylated C's in CHG context:	1984796607
+Total unmethylated C's in CHH context:	6498117358
+Total unmethylated C's in Unknown context:	1587884
+
+C methylated in CpG context:	71.3%
+C methylated in CHG context:	0.4%
+C methylated in CHH context:	0.4%
+C methylated in Unknown context (CN or CHN):	1.3%
+
+
+Bismark completed in 1d 12h 59m 32s

@@ -1,0 +1,42 @@
+Bismark report for: BACW_64_1_val_1.fq.gz and BACW_64_2_val_2.fq.gz (version: v0.24.2)
+Bismark was run with Bowtie 2 against the bisulfite genome of /data/scratch/NAVA1/methylseq_3.0.0_ml/work/stage-112c7ad1-28c8-4f4e-93a2-1f893eaa87d9/35/2394f7487cb0a3bfa1f7181026d390/BismarkIndex/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 1000
+Option '--directional' specified (default mode): alignments to complementary strands (CTOT, CTOB) were ignored (i.e. not performed)
+
+Final Alignment report
+======================
+Sequence pairs analysed in total:	250540887
+Number of paired-end alignments with a unique best hit:	201764624
+Mapping efficiency:	80.5% 
+Sequence pairs with no alignments under any condition:	36811737
+Sequence pairs did not map uniquely:	11964526
+Sequence pairs which were discarded because genomic sequence could not be extracted:	49
+
+Number of sequence pairs with unique best (first) alignment came from the bowtie output:
+CT/GA/CT:	100877895	((converted) top strand)
+GA/CT/CT:	0	(complementary to (converted) top strand)
+GA/CT/GA:	0	(complementary to (converted) bottom strand)
+CT/GA/GA:	100886680	((converted) bottom strand)
+
+Number of alignments to (merely theoretical) complementary strands being rejected in total:	0
+
+Final Cytosine Methylation Report
+=================================
+Total number of C's analysed:	11127764327
+
+Total methylated C's in CpG context:	401004552
+Total methylated C's in CHG context:	18983576
+Total methylated C's in CHH context:	66983497
+Total methylated C's in Unknown context:	29358
+
+Total unmethylated C's in CpG context:	163859624
+Total unmethylated C's in CHG context:	2419797878
+Total unmethylated C's in CHH context:	8057135200
+Total unmethylated C's in Unknown context:	2020111
+
+C methylated in CpG context:	71.0%
+C methylated in CHG context:	0.8%
+C methylated in CHH context:	0.8%
+C methylated in Unknown context (CN or CHN):	1.4%
+
+
+Bismark completed in 1d 18h 0m 35s

@@ -1,0 +1,42 @@
+Bismark report for: BACW_43_1_val_1.fq.gz and BACW_43_2_val_2.fq.gz (version: v0.24.2)
+Bismark was run with Bowtie 2 against the bisulfite genome of /media/ml/54e2ab4d-7887-4fc1-b62a-f962ab951051/cfNOME/pilot/methylseq/methylseq/work/stage-9f855df7-31e0-4e42-82bb-394b9dea2a05/d6/db220c2fb6583105ff7959dc51f3be/BismarkIndex/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 1000
+Option '--directional' specified (default mode): alignments to complementary strands (CTOT, CTOB) were ignored (i.e. not performed)
+
+Final Alignment report
+======================
+Sequence pairs analysed in total:	205070296
+Number of paired-end alignments with a unique best hit:	165880233
+Mapping efficiency:	80.9% 
+Sequence pairs with no alignments under any condition:	30254579
+Sequence pairs did not map uniquely:	8935484
+Sequence pairs which were discarded because genomic sequence could not be extracted:	88
+
+Number of sequence pairs with unique best (first) alignment came from the bowtie output:
+CT/GA/CT:	82912991	((converted) top strand)
+GA/CT/CT:	0	(complementary to (converted) top strand)
+GA/CT/GA:	0	(complementary to (converted) bottom strand)
+CT/GA/GA:	82967154	((converted) bottom strand)
+
+Number of alignments to (merely theoretical) complementary strands being rejected in total:	0
+
+Final Cytosine Methylation Report
+=================================
+Total number of C's analysed:	8918647001
+
+Total methylated C's in CpG context:	297508011
+Total methylated C's in CHG context:	7723246
+Total methylated C's in CHH context:	24949903
+Total methylated C's in Unknown context:	20006
+
+Total unmethylated C's in CpG context:	141546538
+Total unmethylated C's in CHG context:	1909366029
+Total unmethylated C's in CHH context:	6537553274
+Total unmethylated C's in Unknown context:	1661189
+
+C methylated in CpG context:	67.8%
+C methylated in CHG context:	0.4%
+C methylated in CHH context:	0.4%
+C methylated in Unknown context (CN or CHN):	1.2%
+
+
+Bismark completed in 1d 2h 58m 18s

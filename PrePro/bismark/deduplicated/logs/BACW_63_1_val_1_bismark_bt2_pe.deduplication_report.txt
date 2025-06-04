@@ -1,0 +1,7 @@
+
+Total number of alignments analysed in BACW_63_1_val_1_bismark_bt2_pe.bam:	171402595
+Total number duplicated alignments removed:	27187265 (15.86%)
+Duplicated alignments were found at:	23373718 different position(s)
+
+Total count of deduplicated leftover sequences: 144215330 (84.14% of total)
+

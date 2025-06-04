@@ -1,0 +1,42 @@
+Bismark report for: BACW_52_1_val_1.fq.gz and BACW_52_2_val_2.fq.gz (version: v0.24.2)
+Bismark was run with Bowtie 2 against the bisulfite genome of /data/scratch/NAVA1/methylseq_3.0.0/work/stage-d1d7cd42-656f-4374-91a2-14922ca17179/18/5065105031e790c8de4cbfd2293a11/BismarkIndex/ with the specified options: -q --score-min L,0,-0.2 --ignore-quals --no-mixed --no-discordant --dovetail --maxins 1000
+Option '--directional' specified (default mode): alignments to complementary strands (CTOT, CTOB) were ignored (i.e. not performed)
+
+Final Alignment report
+======================
+Sequence pairs analysed in total:	242180236
+Number of paired-end alignments with a unique best hit:	191775745
+Mapping efficiency:	79.2% 
+Sequence pairs with no alignments under any condition:	39241987
+Sequence pairs did not map uniquely:	11162504
+Sequence pairs which were discarded because genomic sequence could not be extracted:	118
+
+Number of sequence pairs with unique best (first) alignment came from the bowtie output:
+CT/GA/CT:	95875467	((converted) top strand)
+GA/CT/CT:	0	(complementary to (converted) top strand)
+GA/CT/GA:	0	(complementary to (converted) bottom strand)
+CT/GA/GA:	95900160	((converted) bottom strand)
+
+Number of alignments to (merely theoretical) complementary strands being rejected in total:	0
+
+Final Cytosine Methylation Report
+=================================
+Total number of C's analysed:	10389534231
+
+Total methylated C's in CpG context:	352618756
+Total methylated C's in CHG context:	6570945
+Total methylated C's in CHH context:	21529734
+Total methylated C's in Unknown context:	21525
+
+Total unmethylated C's in CpG context:	160686353
+Total unmethylated C's in CHG context:	2235997990
+Total unmethylated C's in CHH context:	7612130453
+Total unmethylated C's in Unknown context:	1932766
+
+C methylated in CpG context:	68.7%
+C methylated in CHG context:	0.3%
+C methylated in CHH context:	0.3%
+C methylated in Unknown context (CN or CHN):	1.1%
+
+
+Bismark completed in 1d 11h 43m 4s
