@@ -22,4 +22,4 @@ PrePro/bismark/methylation_call/methylation_calls/CpG_OB_*_1_val_1_bismark_bt2_p
 *.rda
 # Ignore fragment analysis lengths files
 
-/mnt/mydisk/EM_Seq_ALSvsCT/fragment_analysis/raw_lengths/*.lengths.txt
+fragment_analysis/raw_lengths/*.lengths.txt
