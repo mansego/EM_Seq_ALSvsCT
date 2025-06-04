@@ -1,0 +1,21 @@
+# This file is part of the Bismark pipeline for EM-Seq sequencing data analysis.
+# It specifies files and directories to be ignored by Git.
+# Reference genome and annotation files
+PrePro/references/*
+
+# Ignore BAM files and their index files
+PrePro/bismark/deduplicated/*.bam
+PrePro/bismark/deduplicated/*.bam.bai
+
+# Ignore compressed bedGraph files
+PrePro/bismark/methylation_call/bedGraph/*.bedGraph.gz
+
+PrePro/bismark/methylation_call/mbias/*.M-bias.txt
+# Ignore deduplicated methylation call files
+PrePro/bismark/methylation_call/methylation_call/*_1_val_1_bismark_bt2_pe.deduplicated.txt.gz
+PrePro/bismark/methylation_call/methylation_coverage/*_1_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz
+PrePro/bismark/methylation_call/methylation_calls/CpG_OT_*_1_val_1_bismark_bt2_pe.deduplicated.txt.gz
+
+# Ignore R data files anywhere in the repository
+*.rds
+*.rda
