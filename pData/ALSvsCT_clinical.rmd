@@ -1,0 +1,222 @@
+---
+title: 'Exploratory Data Analysis: ALS vs Control Groups'
+author: "ML Mansego"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: cosmo
+    highlight: tango
+  pdf_document:
+    toc: true
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = 'center', fig.pos = 'H')
+options(gtsummary.print_engine = "kable")
+```
+## Introduction
+This report presents a comprehensive clinical characterization of Amyotrophic Lateral Sclerosis (ALS) patients compared to control subjects. The analysis focuses on demographic factors, comorbidity profiles, and disease-specific characteristics to identify potential patterns that may inform our understanding of ALS pathophysiology. The study employs statistical comparisons and visual analytics to highlight key differences between groups.
+
+```{r}
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(ggridges)
+library(ggcorrplot)
+library(patchwork)
+library(viridis)
+library(gtsummary)
+library(magrittr)
+
+data <- read.csv("/mnt/mydisk/EM_Seq_ALSvsCT/pData/pData_ALSvsCT.csv") %>%
+  mutate(across(c(Condition, Gender, HTN, DM, HLD, Smoking), as.factor)) %>%
+  mutate(ALS_Phenotype = ifelse(Condition == "Control", NA, ALS_Phenotype),
+         ALS_Phenotype = as.factor(ALS_Phenotype))
+# Create ALS-only dataset
+als_data <- data %>% filter(Condition == "ALS")
+
+```
+## 1. Demographic Overview
+**Clinical Context:** This section compares fundamental demographic and clinical features between ALS patients and healthy controls. As shown in the demographic and clinical summary table (Table 1), no statistically significant differences were observed in age or sex between the two groups, supporting appropriate demographic matching. As expected, scores on the Revised Amyotrophic Lateral Sclerosis Functional Rating Scale (ALSFRS-R) were significantly lower in ALS patients, as this scale is specifically designed to assess disease progression in individuals with ALS. No significant differences were found in the prevalence of comorbidities between ALS patients and controls.
+
+```{r tbl1, results='asis'}
+# Summary table
+tbl_summary(
+  data %>% select(-Sample, -Sample_ID, -Batch,-Progression_ratio,-Onset_sympton,-ALS_Phenotype),
+  by = Condition,
+  type = list(
+    c(Age,  ALSFRSR) ~ "continuous",
+    c(HTN, DM, HLD,Smoking, Gender) ~ "dichotomous"
+    ),
+  statistic = list(
+    all_continuous() ~ c("{mean} ± {sd}"),
+    all_categorical() ~ "{n} ({p}%)"
+  ),
+  digits = list(all_continuous() ~ 1),
+  value = list(
+    Gender ~ "Female",
+    HTN ~ "Y",  # This specifies to show the "Y" (Yes) category
+    DM ~ "Y",   # for hypertension, diabetes, and
+    HLD ~ "Y",   # hyperlipidemia
+    Smoking ~ "Y"
+  ),
+  label = list(
+    Age ~ "Age (years)",
+    Gender ~ "Sex (F)",
+    HTN ~ "Hypertension (Y)",
+    DM ~ "Diabetes Mellitus (Y)",
+    HLD ~ "Hyperlipidemia (Y)",
+    Smoking ~"Smoking (Y)",
+    ALSFRSR ~ "ALSFRS-R"
+  ),
+  missing = "no",
+  missing_text = "-"
+) %>% 
+  add_p() %>%
+  modify_table_body(
+    ~ .x %>%
+      mutate(
+        across(
+          all_stat_cols(),
+          ~ case_when(
+            is.na(.) ~ "-",
+            row_type == "level" & variable %in% c("HTN", "DM", "HLD", "Gender", "Smoking") & 
+              (label == "N" | label == "Male") ~ NA_character_,  
+            TRUE ~ .
+          )
+        )
+      ) %>%
+      filter(!(row_type == "level" & is.na(stat_1) & is.na(stat_2)))
+  ) %>%
+  modify_caption("Demographic and Clinical Characteristics")
+```
+
+Table 1. Demographic and clinical characteristics of ALS patients and control subjects. Continuous variables are presented as mean ± standard deviation (SD), and categorical variables as counts and percentages. Comparisons between groups were performed using the Wilcoxon rank sum test for continuous variables and Fisher’s exact test for categorical variables. Statistically significant differences were only observed in the ALSFRS-R scores (p < 0.001), which reflect functional impairment in ALS patients.
+
+## 2. Age Distribution
+**Biological Significance**: Age is a critical factor in neurodegenerative diseases. The following graph shows that there are no differences between the  ALS patients and controls.
+
+```{r}
+ggplot(data, aes(x = Condition, y = Age, fill = Condition)) +
+  geom_violin(alpha = 0.6, trim = FALSE) +
+  geom_boxplot(width = 0.2, fill = "white", outlier.shape = NA) +
+  geom_jitter(width = 0.1, alpha = 0.6, size = 2) +
+  scale_fill_manual(values = c("#E64B35", "#4DBBD5")) +
+  labs(title = "Age Distribution by Group", x = "", y = "Age (years)") +
+  theme_minimal(base_size = 10) +
+  stat_compare_means(method = "t.test", label = "p.format", label.x = 2, label.y = 80, size = 4)
+```
+
+The violin plot demonstrates similar age distributions between ALS and control groups, confirming the age-matched study design. This supports the validity of group comparisons in downstream analyses by minimizing age-related confounding effects.
+
+## 3. Comorbidity Radar Chart
+**Clinical Relevance:** Comorbid conditions may influence ALS progression or reflect shared pathological mechanisms. Figure 2 illustrates the comorbidity profiles of ALS patients and controls. No statistically significant differences were found between groups for any of the evaluated comorbidities (p > 0.05; see Table 1). Although a higher prevalence of hypertension was observed among ALS patients (38%) compared to controls (75%), and diabetes mellitus was only reported in one control subject, these differences did not reach statistical significance (p = 0.3 and >0.9, respectively). These non-significant trends may point toward potential vascular or metabolic factors in ALS, but further investigation with larger cohorts is needed to clarify these observations.
+
+```{r radar-chart, fig.width=8}
+comorb <- data %>%
+  group_by(Condition) %>%
+  summarise(
+    HTN = mean(HTN == "Y", na.rm = TRUE) * 100,
+    DM = mean(DM == "Y", na.rm = TRUE) * 100,
+    HLD = mean(HLD == "Y", na.rm = TRUE) * 100,
+    Smoking = mean(Smoking == "Y", na.rm = TRUE) * 100
+  ) %>%
+  pivot_longer(-Condition, names_to = "Comorbidity", values_to = "Percentage")
+
+ggplot(comorb, aes(x = Comorbidity, y = Percentage, group = Condition, color = Condition)) +
+  geom_point(size = 3) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#E64B35", "#4DBBD5")) +
+  coord_polar() +
+  labs(title = "Comorbidity Profile Comparison", x = "", y = "Percentage (%)") +
+  theme_minimal()
+```
+Figure 2. Radar plot showing the distribution of comorbidities between ALS patients and controls. Variables include Hypertension (HTN), Hyperlipidemia (HLD), Diabetes Mellitus (DM), and Smoking status. No statistically significant differences were found between groups (Fisher’s exact test, p > 0.05).
+
+
+
+## 4. Phenotype Analysis (ALS Only)
+**Pathophysiological Insight:** ALS manifests with different phenotypic presentations that may represent distinct disease subtypes. This section examines whether clinical characteristics vary between bulbar and spinal onset cases.
+
+Bulbar and spinal onset ALS patients exhibit phenotypic differences in their clinical presentation. Table 2 summarizes the demographic and clinical characteristics of ALS patients stratified by disease phenotype (bulbar vs. spinal onset). No statistically significant differences were observed between phenotypes regarding sex, age, comorbidities, ALSFRS-R scores, or progression ratio.
+
+As expected, a statistically significant difference was found in the number of onset symptoms (p = 0.019), with spinal onset patients presenting a higher number of initial symptomatic regions (2.5 ± 0.6) compared to bulbar onset patients (1.0 ± 0.0). This finding is consistent with the clinical presentation of ALS, where bulbar onset typically involves a focal pattern restricted to the bulbar region (e.g., dysarthria, dysphagia), whereas spinal onset more frequently involves symptoms affecting multiple motor regions, such as upper and lower limbs.
+
+These findings are further illustrated in Figure 3. The left panel shows the age distribution by ALS phenotype, confirming that no significant differences in age were observed between bulbar and spinal onset patients. The right panel depicts the number of onset symptoms per patient using a violin plot, supporting the observation that spinal onset patients exhibited a significantly higher number of symptomatic regions at disease onset (p = 0.014).
+
+```{r tbl2, results='asis'}
+tbl_summary(
+  als_data %>% select(-Sample, -Sample_ID, -Batch, -Condition),
+  by = ALS_Phenotype,
+  type = list(
+    c(Age, Onset_sympton, ALSFRSR, Progression_ratio) ~ "continuous",
+    c(HTN, DM, HLD, Smoking, Gender) ~ "dichotomous"  
+  ),
+  statistic = list(
+    all_continuous() ~ c("{mean} ± {sd}"),
+    all_categorical() ~ "{n} ({p}%)"
+  ),
+  digits = list(all_continuous() ~ 1),
+  value = list(
+    Gender ~ "Female", HTN ~ "Y", DM ~ "Y", HLD ~ "Y", Smoking ~ "Y"
+  ),
+  label = list(
+    Age ~ "Age (years)", Gender ~ "Sex (F)", HTN ~ "Hypertension (Y)",
+    DM ~ "Diabetes Mellitus (Y)", HLD ~ "Hyperlipidemia (Y)", Smoking ~"Smoking (Y)",
+    Onset_sympton ~ "Onset symptom", ALSFRSR ~ "ALSFRS-R", Progression_ratio ~ "Progression ratio"
+  ),
+  missing = "no",
+  missing_text = "-"
+) %>% 
+  add_p() %>%
+  modify_table_body(~ .x %>%
+    mutate(across(
+      all_stat_cols(),
+      ~ case_when(
+        is.na(.) ~ "-",
+        row_type == "level" & variable %in% c("HTN", "DM", "HLD", "Gender", "Smoking") & 
+          (label == "N" | label == "Male") ~ NA_character_,  
+        TRUE ~ .
+      )
+    )) %>%
+    filter(!(row_type == "level" & is.na(stat_1) & is.na(stat_2)))
+  ) %>%
+  modify_caption("ALS Patient Characteristics by Phenotype")
+
+```
+Table 2. Demographic and clinical characteristics of ALS patients stratified by phenotype (bulbar vs. spinal onset). Continuous variables are presented as mean ± standard deviation (SD), and categorical variables as counts and percentages. Comparisons between groups were performed using the Wilcoxon rank sum test for continuous variables and Fisher’s exact test for categorical variables.
+```{r  }
+p1 <- ggplot(als_data, aes(x = Age, fill = ALS_Phenotype)) +
+   geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("#00A087", "#3C5488")) +
+  labs(title = "Age Distribution by ALS Phenotype", x = "", y = "Density") +
+  theme_minimal(base_size = 8)
+
+p2 <- ggplot(als_data, aes(x = ALS_Phenotype, y = Onset_sympton, fill = ALS_Phenotype)) +
+  geom_violin(alpha = 0.6, trim = FALSE) +
+  geom_boxplot(width = 0.2, fill = "white", outlier.shape = NA) +
+  geom_jitter(width = 0.1, alpha = 0.6, size = 2) +
+  scale_fill_manual(values = c("#00A087", "#3C5488")) +
+  labs(title = "Onset symptom by Phenotype", x = "", y = "Onset symptom (N)") +
+  theme_minimal(base_size = 8) +
+  stat_compare_means(method = "t.test", label = "p.format", label.y = 4, size = 3)
+
+p1 + p2
+```
+Figure 3. Comparison of age distribution and number of onset symptoms between ALS phenotypes (bulbar vs. spinal). Left panel: Age distribution density plot by ALS phenotype, showing no statistically significant difference in age between groups. Right panel: Violin plot of the number of onset symptoms, with spinal onset patients showing a significantly higher number of symptomatic regions at disease onset compared to bulbar onset patients (p = 0.014, Wilcoxon rank sum test).
+
+
+## Summary of Key Findings
+
+1. **Demographic Matching**: The study groups showed comparable age and sex distributions (ALS: `r mean(filter(data, Condition == "ALS")$Age, na.rm = TRUE) %>% round(1)` ± `r sd(filter(data, Condition == "ALS")$Age, na.rm = TRUE) %>% round(1)` years; Controls: `r mean(filter(data, Condition == "Control")$Age, na.rm = TRUE) %>% round(1)` ± `r sd(filter(data, Condition == "Control")$Age, na.rm = TRUE) %>% round(1)` years; p = `r t.test(Age ~ Condition, data = data)$p.value %>% round(3)`), establishing a solid foundation for subsequent comparisons.
+
+2. **Disease Severity**: The significantly reduced ALSFRS-R scores in ALS patients (`r mean(filter(data, Condition == "ALS")$ALSFRSR, na.rm = TRUE) %>% round(1)` ± `r sd(filter(data, Condition == "ALS")$ALSFRSR, na.rm = TRUE) %>% round(1)`) versus controls (48 ± 0; p < 0.001) validate our cohort's clinical representativeness.
+
+3. **Phenotypic Heterogeneity**:
+
+  - Bulbar onset cases (n = `r sum(als_data$ALS_Phenotype == "Bulbar", na.rm = TRUE)`) showed differences in symptom presentation compared to spinal onset cases (n = `r sum(als_data$ALS_Phenotype == "Spinal", na.rm = TRUE)`) (p = `r t.test(Onset_sympton ~ ALS_Phenotype, data = als_data)$p.value %>% round(3)`), reinforcing the clinical heterogeneity of ALS phenotypes.
