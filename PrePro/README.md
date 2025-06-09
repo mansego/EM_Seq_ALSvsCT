@@ -2,7 +2,7 @@
 
 This step involves the preprocessing and methylation extraction of cfDNA samples using the [nf-core/methylseq](https://github.com/nf-core/methylseq) pipeline. The alignment tool used is **Bismark**, and the data corresponds to **Enzymatic Methyl-seq (EM-seq)** libraries.
 
-## Pipeline Characteristics
+## ⚙️ Pipeline Characteristics
 
 The configuration for this step is defined in the [params.yaml](./params.yaml) file. The main characteristics are:
 
@@ -15,7 +15,7 @@ The configuration for this step is defined in the [params.yaml](./params.yaml) f
   --clip_R1 10 --clip_R2 10 --three_prime_clip_R1 10 --three_prime_clip_R2 10
   ```
 
-## Environment Setup and `nf-core/methylseq` Execution
+## 🛠️ Environment Setup and `nf-core/methylseq` Execution
 
 To execute the pipeline, a computational environment was set up using the **mamba** package manager, due to its performance advantages over conda. The following steps were followed:
 
@@ -49,12 +49,12 @@ nextflow run nf-core/methylseq -profile singularity \
   -resume
 ```
 
-## Workflow Overview
+## 🔁 Workflow Overview
 Below is the official workflow diagram for nf-core/methylseq:
 
 ![nf-core methylseq workflow](https://github.com/nf-core/methylseq/blob/3.0.0/docs/images/3.0.0_metromap.png?raw=true)
 
-## Sample Sheet Format
+## 📋 Sample Sheet Format
 
 The input samples are listed in a CSV file [samplesheet.csv](./samplesheet.csv) with the following format:
 
@@ -69,7 +69,7 @@ BACW_50,data/241122_A00902_B_L1-2_BACW-50_R1.fastq.gz,data/241122_A00902_B_L1-2_
 BACW_52,data/241122_A00902_B_L1-2_BACW-52_R1.fastq.gz,data/241122_A00902_B_L1-2_BACW-52_R2.fastq.gz,
 BACW_53,data/241122_A00902_B_L1-2_BACW-53_R1.fastq.gz,data/241122_A00902_B_L1-2_BACW-53_R2.fastq.gz,
 ```
-## Output Structure
+## 📂 Output Structure
 
 After the pipeline execution, the following directory structure was generated within the output directory:
 
