@@ -3,14 +3,14 @@ title: 'Exploratory Data Analysis: ALS vs Control Groups'
 author: "ML Mansego"
 date: "`r Sys.Date()`"
 output:
+  pdf_document:
+    toc: true
+    toc_depth: '3'
   html_document:
     toc: true
     toc_depth: 3
     theme: cosmo
     highlight: tango
-  pdf_document:
-    toc: true
-    toc_depth: '3'
 ---
 
 ```{r setup, include=FALSE}
