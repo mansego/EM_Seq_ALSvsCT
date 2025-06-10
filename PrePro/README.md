@@ -74,7 +74,7 @@ BACW_53,data/241122_A00902_B_L1-2_BACW-53_R1.fastq.gz,data/241122_A00902_B_L1-2_
 After the pipeline execution, the following directory structure was generated within the output directory:
 
 ```
-bismark/
+PrePro/
 ├── bismark
 │   ├── alignments
 │   ├── deduplicated
@@ -87,13 +87,6 @@ bismark/
 │   └── zips
 ├── multiqc
 │   └── bismark
-├── pipeline_info
-│   ├── execution_report_**.html
-│   ├── execution_timeline_**.html
-│   ├── execution_trace_**.txt
-│   ├── nf_core_methylseq_software_mqc_versions.yml
-│   ├── params_**.json
-│   └── pipeline_dag_**.html
 └── trimgalore
     ├── fastqc
     └── logs

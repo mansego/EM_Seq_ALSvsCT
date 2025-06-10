@@ -1,0 +1,232 @@
+---
+title: "Enrichment Analysis of Differentially Methylated Genes (DMLs and DMRs)"
+author: "ML Mansego"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+##  Load Required Packages
+
+```{r, include=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install(c("clusterProfiler", "org.Hs.eg.db", "DOSE", "enrichplot", "ReactomePA", "DisGeNET"), update = FALSE)
+
+library(readr)
+library(dplyr)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(DOSE)
+library(enrichplot)
+#library(DisGeNET)
+library(ggplot2)
+library(ComplexUpset)
+library(tidyr)
+library(igraph)
+library(ggraph)
+library(stringr)
+```
+
+## Load Annotated DML and DMR Data
+
+```{r}
+# Load files
+setwd("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/")
+dmls <- read_tsv("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/DMLs_annotated.tsv")
+dmrs <- read_tsv("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/DMRs_annotated.tsv")
+
+# Split multi-gene entries on ';' and flatten
+genes_dmls <- unlist(strsplit(dmls$annot.symbol, ";"))
+genes_dmrs <- unlist(strsplit(dmrs$annot.symbol, ";"))
+
+# Clean whitespace and remove NAs
+genes_dmls <- unique(trimws(genes_dmls[!is.na(genes_dmls)]))
+genes_dmrs <- unique(trimws(genes_dmrs[!is.na(genes_dmrs)]))
+
+# Optionally remove any symbols with non-standard characters
+genes_dmls <- genes_dmls[grepl("^[A-Za-z0-9]+$", genes_dmls)]
+genes_dmrs <- genes_dmrs[grepl("^[A-Za-z0-9]+$", genes_dmrs)]
+```
+
+## Convert Gene Symbols to Entrez IDs
+
+```{r}
+genes_dmls_entrez <- bitr(genes_dmls, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)
+genes_dmrs_entrez <- bitr(genes_dmrs, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)
+```
+
+
+## GO enrichment for BP, CC, and MF separately
+```{r}
+# Perform enrichGO for all three ontologies
+ego_BP <- enrichGO(genes_dmls_entrez$ENTREZID, OrgDb = org.Hs.eg.db, ont = "BP", readable = TRUE)
+ego_CC <- enrichGO(genes_dmls_entrez$ENTREZID, OrgDb = org.Hs.eg.db, ont = "CC", readable = TRUE)
+ego_MF <- enrichGO(genes_dmls_entrez$ENTREZID, OrgDb = org.Hs.eg.db, ont = "MF", readable = TRUE)
+
+# Convert and label ontology
+df_BP <- ego_BP@result %>% mutate(ONTOLOGY = "BP")
+df_CC <- ego_CC@result %>% mutate(ONTOLOGY = "CC")
+df_MF <- ego_MF@result %>% mutate(ONTOLOGY = "MF")
+
+# Combine and clean
+go_df <- bind_rows(df_BP, df_CC, df_MF) %>%
+  filter(p.adjust < 0.05) %>%
+  group_by(ONTOLOGY) %>%
+  slice_min(order_by = p.adjust, n = 10) %>%
+  ungroup() %>%
+  mutate(GeneRatio = Count / as.numeric(sub("/.*", "", BgRatio))) %>%
+  mutate(Description = str_wrap(Description, width = 50))  # wrap long labels
+
+# Plot
+ggplot(go_df, aes(x = GeneRatio, y = reorder(Description, GeneRatio))) +
+  geom_point(aes(size = Count, color = p.adjust)) +
+  scale_color_gradient(low = "blue", high = "red", name = "p.adjust") +
+  scale_size_continuous(name = "Count", range = c(3, 8)) +
+  facet_wrap(~ONTOLOGY, ncol = 1, scales = "free_y", strip.position = "right") +
+  labs(title = "GO terms", x = "GeneRatio", y = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    strip.text = element_text(size = 12, face = "bold"),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10),
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 10),
+    panel.spacing = unit(1, "lines")
+  )
+write_csv(go_df,file="/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/GO_DMLs_DSS.ALSvsCT.csv")
+```
+
+```{r}
+rm(ego_BP,ego_CC, ego_MF)
+# Perform enrichGO for all three ontologies
+ego_BP <- enrichGO(genes_dmrs_entrez$ENTREZID, OrgDb = org.Hs.eg.db, ont = "BP", readable = TRUE)
+ego_CC <- enrichGO(genes_dmrs_entrez$ENTREZID, OrgDb = org.Hs.eg.db, ont = "CC", readable = TRUE)
+ego_MF <- enrichGO(genes_dmrs_entrez$ENTREZID, OrgDb = org.Hs.eg.db, ont = "MF", readable = TRUE)
+
+# Convert and label ontology
+df_BP <- ego_BP@result %>% mutate(ONTOLOGY = "BP")
+df_CC <- ego_CC@result %>% mutate(ONTOLOGY = "CC")
+df_MF <- ego_MF@result %>% mutate(ONTOLOGY = "MF")
+
+# Combine and clean
+go_df <- bind_rows(df_BP, df_CC, df_MF) %>%
+  filter(pvalue < 0.05) %>%
+  group_by(ONTOLOGY) %>%
+  slice_min(order_by = p.adjust, n = 10) %>%
+  ungroup() %>%
+  mutate(GeneRatio = Count / as.numeric(sub("/.*", "", BgRatio))) %>%
+  mutate(Description = str_wrap(Description, width = 50))  # wrap long labels
+write_csv(go_df,file="/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/GO_DMRs_DSS.ALSvsCT.csv")
+# Plot
+ggplot(go_df, aes(x = GeneRatio, y = reorder(Description, GeneRatio))) +
+  geom_point(aes(size = Count, color = p.adjust)) +
+  scale_color_gradient(low = "blue", high = "red", name = "p.adjust") +
+  scale_size_continuous(name = "Count", range = c(3, 8)) +
+  facet_wrap(~ONTOLOGY, ncol = 1, scales = "free_y", strip.position = "right") +
+  labs(title = "GO terms", x = "GeneRatio", y = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    strip.text = element_text(size = 12, face = "bold"),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10),
+    legend.title = element_text(size = 11),
+    legend.text = element_text(size = 10),
+    panel.spacing = unit(1, "lines")
+  )
+
+barplot(ego_dmls, showCategory = 20, title = "DML GO Enrichment - Biological Processes")
+barplot(ego_dmrs, showCategory = 20, title = "GO Enrichment - DMRs")
+```
+
+## KEGG Pathway Enrichment
+
+```{r}
+kegg_dmls <- enrichKEGG(
+  gene = genes_dmls_entrez$ENTREZID,
+  organism = "hsa",
+  pvalueCutoff = 0.05
+)
+kegg_dmls <- setReadable(kegg_dmls, OrgDb = org.Hs.eg.db, keyType = "ENTREZID")
+
+# Compute term similarity
+kegg_sim <- pairwise_termsim(kegg_dmls)
+
+# Plot enrichment map (basic version)
+emapplot(kegg_sim, showCategory = 30, layout = "fr", color = "pvalue")
+upsetplot(kegg_dmls)
+
+# DMR
+kegg_dmrs <- enrichKEGG(
+  gene = genes_dmrs_entrez$ENTREZID,
+  organism = "hsa",
+  pvalueCutoff = 0.05
+)
+kegg_dmrs <- setReadable(kegg_dmrs, OrgDb = org.Hs.eg.db, keyType = "ENTREZID")
+
+# Compute term similarity
+kegg_sim <- pairwise_termsim(kegg_dmrs)
+
+# Plot enrichment map (basic version)
+emapplot(kegg_sim, showCategory = 30, layout = "fr", color = "pvalue")
+upsetplot(kegg_dmrs)
+
+# Make readable
+kegg_dmls <- setReadable(kegg_dmls, OrgDb = org.Hs.eg.db, keyType = "ENTREZID")
+kegg_dmrs <- setReadable(kegg_dmrs, OrgDb = org.Hs.eg.db, keyType = "ENTREZID")
+
+write_csv(as.data.frame(kegg_dmls),file="/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/kegg_dmls_DSS.ALSvsCT.csv")
+write_csv(as.data.frame(kegg_dmrs),file="/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/kegg_dmrs_DSS.ALSvsCT.csv")
+
+dotplot(kegg_dmls, showCategory = 15, title = "KEGG Pathways - DMLs")
+dotplot(kegg_dmrs, showCategory = 15, title = "KEGG Pathways - DMRs")
+```
+
+## DisGeNET Disease Enrichment
+
+```{r}
+disgenet_dmls <- enrichDGN(genes_dmls_entrez$ENTREZID)
+disgenet_dmrs <- enrichDGN(genes_dmrs_entrez$ENTREZID)
+
+
+gda <- read.delim("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/RDS/curated_gene_disease_associations.tsv")
+
+disease2gene <- gda[, c("diseaseId", "geneId")]
+disease2name <- gda[, c("diseaseId", "diseaseName")]
+
+disgenet_dmls <- enricher(genes_dmls_entrez$ENTREZID, 
+                    TERM2GENE=disease2gene,
+                    TERM2NAME=disease2name, 
+                    pAdjustMethod = "fdr",
+                    pvalueCutoff = 0.05,)
+
+disgenet_dmrs <- enricher(genes_dmrs_entrez$ENTREZID, 
+                    TERM2GENE=disease2gene,
+                    TERM2NAME=disease2name, 
+                    pAdjustMethod = "fdr",
+                    pvalueCutoff = 0.05,)
+
+
+
+barplot(disgenet_dmls, showCategory = 15, title = "DisGeNET - DMLs")
+barplot(disgenet_dmrs, showCategory = 15, title = "DisGeNET - DMRs")
+
+```
+## Export Enrichment Results (Optional)
+
+```{r}
+write.csv(as.data.frame(ego_dmls), "GO_BP_enrichment_DMLs.csv", row.names = FALSE)
+write.csv(as.data.frame(ego_dmrs), "GO_BP_enrichment_DMRs.csv", row.names = FALSE)
+
+write.csv(as.data.frame(kegg_dmls), "KEGG_enrichment_DMLs.csv", row.names = FALSE)
+write.csv(as.data.frame(kegg_dmrs), "KEGG_enrichment_DMRs.csv", row.names = FALSE)
+
+write.csv(as.data.frame(disgenet_dmls), "DisGeNET_enrichment_DMLs.csv", row.names = FALSE)
+write.csv(as.data.frame(disgenet_dmrs), "DisGeNET_enrichment_DMRs.csv", row.names = FALSE)
+```
