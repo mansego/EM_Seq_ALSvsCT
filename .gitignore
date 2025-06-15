@@ -22,6 +22,7 @@ PrePro/bismark/methylation_call/methylation_calls/CpG_OB_*_1_val_1_bismark_bt2_p
 # Ignore R data files anywhere in the repository
 *.rds
 *.rda
+*.RData
 # Ignore fragment analysis lengths files
 
 fragment_analysis/raw_lengths/*.lengths.txt
