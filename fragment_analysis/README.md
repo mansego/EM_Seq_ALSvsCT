@@ -88,6 +88,8 @@ This document performs:
 | `short-to-long_ratio_ALSvsCT.png`                     | Violin/boxplots of short/long/ratio              |
 | `fragment_size_distribution_BulbarvsSpinal.png`       | Insert size profile by ALS phenotype             |
 | `fragment_size_differnces_BulbarvsSpinal.png`         | Fragmentation differences (Bulbar vs Spinal)     |
+| `Nucleosome_Peak_Abundance_ALSvsCT.png`               | Nucleosome fragment abundance (ALS vs Control)   |
+| `Nucleosome_Peak_Abundance_BvsS.png`                  | Nucleosome fragment abundance (Bulbar vs Spinal) |
 | `short-to-long_ratio_BulbarvsSpinal.png`              | Ratio analysis by ALS phenotype                  |
 | `short-to-long_ratio_BulbarvsSpinal.png`              | Ratio analysis by ALS phenotype                  |
 | `GC_by_group.png`              | GC content in ALS and CT groups                  |
@@ -102,8 +104,9 @@ This document performs:
 | `plots/*.pdf`                            | Sample-level plots from Picard       
 
 ## Observations
-A trend toward increased short fragments and reduced long fragments in ALS vs. controls was observed but did not reach statistical significance.
+A trend toward increased short (mono-nucleosome) fragments and significantly lower long fragments (di and tri-nucleosome) in ALS vs. controls was observed but did not reach statistical significance.
 
-![Plot](figures/short-to-long_ratio_ALSvsCT.png)
-Bulbar-onset ALS showed significantly lower long fragment abundance and a higher short-to-long ratio compared to spinal-onset, suggesting potential phenotype-specific fragmentation signatures. These findings are preliminary and based on small sample numbers.
-![Plot](figures/short-to-long_ratio_BulbarvsSpinal.png)
+![Plot](figures/Nucleosome_Peak_Abundance_ALSvsCT.png)
+
+Bulbar-onset ALS showed significantly lower di and tri-nucleosome fragment abundance and a higher Mono-nucleosome fragment abundance compared to spinal-onset, suggesting potential phenotype-specific fragmentation signatures. These findings are preliminary and based on small sample numbers.
+![Plot](figures/Nucleosome_Peak_Abundance_BvsS.png)
