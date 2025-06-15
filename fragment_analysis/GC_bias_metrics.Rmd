@@ -85,3 +85,7 @@ head(gc_summary)
 
 
 This report presents the average GC bias profiles for the ALS and Control groups based on deduplicated BAM files. The summary statistics help in understanding the library quality and potential sequencing biases between the groups.
+Discussion and Conclusion
+The assessment of GC bias confirmed that the EM-seq libraries from plasma cfDNA in both ALS patients and controls were of comparable quality in terms of coverage uniformity across GC content. Although minor variability was observed in high-GC regions within the ALS group, these deviations were not statistically significant and likely reflect biological or technical heterogeneity rather than systematic bias.
+
+These findings support the validity of downstream methylation and fragmentation analyses by excluding GC bias as a major confounding factor in this dataset.
