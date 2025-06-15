@@ -16,7 +16,9 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_knit$set(root.dir = "/mnt/mydisk/EM_Seq_ALSvsCT/fragment_analysis/")
-
+sink("session_info_GC.txt")
+sessionInfo()
+sink()
 library(tidyverse)
 library(knitr)
 library(readr)

@@ -3,16 +3,16 @@
 title: "cfDNA Fragmentation Analysis in ALS and Control Plasma Samples"
 author: "ML Mansego"
 output:
+  pdf_document:
+    toc: true
+    toc_depth: '2'
+    latex_engine: xelatex
   html_document:
     toc: true
     toc_depth: 2
     number_sections: true
     code_folding: hide
     theme: readable
-  pdf_document:
-    toc: true
-    toc_depth: '2'
-    latex_engine: xelatex
 ---
 
 # Introduction
@@ -23,10 +23,14 @@ The present analysis investigates differences in cfDNA fragmentation patterns be
 
 ```{r setup, include=FALSE}
 knitr::opts_knit$set(root.dir = "/mnt/mydisk/EM_Seq_ALSvsCT/fragment_analysis/")
+sink("session_info_FA.txt")
+sessionInfo()
+sink()
 library(tidyverse)
 library(knitr)
 library(readr)
 library(dplyr)
+library(kableExtra)
 library(tidyr)
 library(ggpubr)
 ```
@@ -44,7 +48,7 @@ sample_metadata <- read_csv("../pData/pData_ALSvsCT.csv") %>%
 
 ## Extraction and Preprocessing
 
-Insert size data were extracted from Picard output files. Only fragment lengths ≤ 600 bp were retained for biological relevance. These lengths encompass mono- (~147 bp) and di-nucleosome (~320 bp) structures, typical of apoptotic DNA fragmentation.
+Insert size data were extracted from Picard output files. Only fragment lengths ≤ 600 bp were retained for biological relevance. 
 
 ```{r, include=FALSE}
 load_fragment_data <- function(file, sample_id) {
@@ -73,9 +77,126 @@ fragment_summary <- fragment_data %>%
     se_count = sd_count / sqrt(n),
     .groups = "drop"
   )
-
-head(fragment_summary)
 ```
+
+## Nucleosome Peak Abundance Analysis
+
+In this section, peak cfDNA fragment sizes associated with mono-, di-, and trinucleosomes were identified within predefined size ranges. For each nucleosome category, the fragment size showing the highest mean abundance was selected separately for ALS and control groups.
+
+To assess potential differences in peak fragment abundance between conditions, the Wilcoxon rank-sum test was applied to each size range. A summary table was generated, presenting the mean and standard deviation of fragment counts per group, along with the corresponding p-values from the statistical tests.
+
+This analysis was performed to explore whether specific nucleosome-associated cfDNA fragments differ in abundance between ALS and controls, which may reflect alterations in chromatin structure or cell death dynamics.
+
+
+
+```{r}
+# This script identifies peak nucleosome fragment sizes in different ranges 
+# and compares their abundance between conditions (ALS vs Control)
+
+## Define nucleosome size ranges
+# We analyze three nucleosome configurations:
+ranges <- list(
+  "Mono" = c(120, 170),   # Mononucleosomes (core particle + short linker)
+  "Di"   = c(280, 350),   # Dinucleosomes
+  "Tri"  = c(430, 600)    # Trinucleosomes
+)
+
+## Find peak abundances for each condition and range
+
+peaks_by_condition <- lapply(names(ranges), function(r) {
+  fragment_summary %>%
+    filter(insert_size >= ranges[[r]][1], insert_size <= ranges[[r]][2]) %>%
+    group_by(Condition) %>%
+    slice_max(mean_count, n = 1, with_ties = FALSE) %>%
+    mutate(Nucleosome_Type = r) %>%
+    select(Condition, Nucleosome_Type, insert_size, mean_count, sd_count)
+}) %>% bind_rows()
+
+## 3. Test (Wilcoxon)
+stat_results <- lapply(names(ranges), function(nuc) {
+  range <- ranges[[nuc]]
+  test <- fragment_summary %>%
+    filter(insert_size >= range[1], insert_size <= range[2]) %>%
+    wilcox.test(mean_count ~ Condition, data = ., exact = FALSE)
+  data.frame(Nucleosome_Type = nuc, p_value = test$p.value)
+}) %>% bind_rows() %>%
+  mutate(p_value = ifelse(p_value < 0.001, "< 0.001", round(p_value, 3)))
+
+## 4. summary by nucleosome and condition
+table_data <- peaks_by_condition %>%
+  mutate(Count_SD = paste0(round(mean_count, 2), " (", round(sd_count, 2), ")")) %>%
+  select(Nucleosome_Type, Condition, Count_SD) %>%
+  pivot_wider(names_from = Condition, values_from = Count_SD) %>%
+  left_join(stat_results, by = "Nucleosome_Type") %>%
+  select(Nucleosome_Type, ALS, Control, p_value)
+
+## 5. table
+table_data %>%
+  kable("latex",
+        booktabs = TRUE,
+        col.names = c("Nucleosome Type", "Bulbar", "Spinal", "p-value"),
+        caption = "Table 2. Summary of peak nucleosome-associated cfDNA fragment counts by condition.") %>%
+  kableExtra::kable_styling(latex_options = c("hold_position", "striped"))
+```
+Mean and standard deviation of fragment counts are shown for the most abundant fragment size within each nucleosome range (Mono-, Di-, and Trinucleosomes) in ALS and control groups. P-values were obtained using the Wilcoxon rank-sum test.
+
+```{r}
+##  Boxplot visualization
+
+fragment_plot_data <- fragment_summary %>%
+  filter(insert_size >= 120 & insert_size <= 600) %>%
+  mutate(Nucleosome_Type = case_when(
+    insert_size >= 120 & insert_size <= 170 ~ "Mono",
+    insert_size >= 280 & insert_size <= 350 ~ "Di",
+    insert_size >= 430 & insert_size <= 600 ~ "Tri",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(Nucleosome_Type))
+
+
+fragment_plot_data_scaled <- fragment_plot_data %>%
+  mutate(mean_count_scaled = mean_count / 10000)
+
+plot_nuc_type_scaled <- function(nuc_type) {
+  df <- fragment_plot_data_scaled %>% filter(Nucleosome_Type == nuc_type)
+  
+  ggplot(df, aes(x = Condition, y = mean_count_scaled, fill = Condition)) +
+    geom_boxplot(width = 0.6, alpha = 0.8) +
+    stat_compare_means(method = "wilcox.test", label = "p.signif", size = 5) +
+    labs(
+      title = paste0(nuc_type, "-nucleosome"),
+      x = NULL,
+      y = "Fragment Count (x10^4)"
+    ) +
+    scale_fill_brewer(palette = "Set1") +
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+      legend.position = "none",
+      plot.margin = margin(10, 10, 10, 10)
+    )
+}
+
+
+p_mono <- plot_nuc_type_scaled("Mono")
+p_di   <- plot_nuc_type_scaled("Di")
+p_tri  <- plot_nuc_type_scaled("Tri")
+
+
+final_plot <- ggarrange(p_mono, p_di, p_tri,
+                        ncol = 3,
+                        labels = c("A", "B", "C"),
+                        align = "v")
+
+print(final_plot)
+ggsave("figures/Nucleosome_Peak_Abundance_ALSvsCT.png", final_plot, 
+       width = 8, height = 5, dpi = 300, bg = "white")
+
+```
+Figure 1. Nucleosome-associated cfDNA fragment abundance across conditions.
+Boxplots show the distribution of cfDNA fragment counts within mono- (A), di- (B), and tri-nucleosome (C) size ranges. Comparisons are shown between ALS and control groups. Fragment counts are scaled by 10⁴ for visualization. Statistical comparisons were performed using the Wilcoxon rank-sum test; significance levels are indicated as follows: p < 0.05 (), p < 0.01 (), p < 0.001 (), and p < 0.0001 (****).
+
+
 
 ## Visualization of Fragment Size Distribution
 
@@ -108,19 +229,27 @@ fragment_plot <- ggplot(fragment_summary, aes(x = insert_size, y = mean_count/10
   ) +
   scale_x_continuous(breaks = seq(0, 600, by = 50), limits = c(0, 600)) +
   scale_y_continuous(labels = scales::comma) +
-  geom_vline(xintercept = c(147, 320), linetype = "dotted", alpha = 0.5) +
+  geom_vline(xintercept = c(147, 313,504), linetype = "dotted", alpha = 0.5) +
   annotate("text", x = 147, y = max(fragment_summary$mean_count/10^6)*0.95, 
            label = "Mono-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8) +
-  annotate("text", x = 320, y = max(fragment_summary$mean_count/10^6)*0.95, 
+    annotate("rect", xmin = 120, xmax = 170, ymin = 0, ymax = Inf,
+              fill = "yellow", alpha = 0.05, color = NA)+
+  annotate("text", x = 313, y = max(fragment_summary$mean_count/10^6)*0.95, 
            label = "Di-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8)+
-  annotate("text", x = 90, y = 2.5, 
-           label = "Short fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 0.8) +
-  annotate("rect", xmin = 110, xmax = 150, ymin = 0, ymax = Inf,
-             fill = "yellow", alpha = 0.05, color = NA)+
-  annotate("text", x = 240, y =2.5, 
-           label = "Long fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 1.5) +
-  annotate("rect", xmin = 180, xmax = 600, ymin = 0, ymax = Inf,
-             fill = "cyan", alpha = 0.05, color = NA)
+      annotate("rect", xmin = 280, xmax = 350, ymin = 0, ymax = Inf,
+              fill = "yellow", alpha = 0.05, color = NA)+
+  annotate("text", x = 504, y = max(fragment_summary$mean_count/10^6)*0.95, 
+           label = "Tri-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8)+
+      annotate("rect", xmin = 430, xmax = 600, ymin = 0, ymax = Inf,
+              fill = "yellow", alpha = 0.05, color = NA)
+#  annotate("text", x = 90, y = 2.5, 
+#           label = "Short fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 0.8) +
+#  annotate("rect", xmin = 110, xmax = 150, ymin = 0, ymax = Inf,
+#             fill = "yellow", alpha = 0.05, color = NA)+
+#  annotate("text", x = 240, y =2.5, 
+#           label = "Long fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 1.5) +
+#  annotate("rect", xmin = 180, xmax = 600, ymin = 0, ymax = Inf,
+#             fill = "cyan", alpha = 0.05, color = NA)
 
 
 # Save the plot
@@ -129,75 +258,16 @@ ggsave("figures/fragment_size_distribution_ALSvsCT.png", fragment_plot,
 print(fragment_plot)
 ```
 
-## Fragment Size Differences by Group (ALS vs Control)
-
-To assess differential fragmentation, insert sizes were binned in 5 bp intervals. For each bin, a Wilcoxon rank-sum test was applied to evaluate count differences between ALS and control groups.
-
-```{r, include=FALSE}
-bin_size <- 5
-plot_data <- fragment_data %>%
-  filter(insert_size <= 600) %>% 
-  mutate(
-    bin = cut(
-      insert_size,
-      breaks = seq(0, 600, by = bin_size),
-      labels = paste0(seq(0, 600 - bin_size, by = bin_size), "-", seq(bin_size, 600, by = bin_size)),
-      include.lowest = TRUE
-    )
-  ) %>%
-  group_by(bin) %>%
-  summarise(
-    mean_ALS = mean(count[Condition == "ALS"]),
-    mean_Control = mean(count[Condition == "Control"]),
-    mean_diff = mean_ALS - mean_Control,
-    p.value = wilcox.test(count ~ Condition, alternative = "greater", exact = FALSE)$p.value,
-    .groups = "drop"
-  ) %>%
-  mutate(
-    bin_start = as.numeric(str_extract(bin, "^\\d+")),
-    bin_end = as.numeric(str_extract(bin, "\\d+$")),
-    bin_mid = (bin_start + bin_end) / 2
-  )
-```
-
-### Significant Bins
-
-The top 10 most differential bins are presented below (sorted by nominal p-value):
-
-```{r, echo=FALSE}
-plot_data %>% arrange(p.value) %>% head(10) %>% kable(digits = 4, caption = "Top 10 Most Differential Fragment Size Bins")
-```
-
-### Differential Fragmentation Plot
-
-The following plot highlights insert size bins where ALS samples differ most from controls. Red bars indicate bins with nominal significance (p < 0.15).
-
-```{r, fig.cap="Differential fragment size profile", echo=FALSE}
-fragment_diff <- ggplot(plot_data, aes(x = bin_mid, y = mean_diff/10^6)) +
-  geom_col(aes(fill = p.value < 0.15), width = bin_size*0.8) +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  scale_fill_manual(values = c("gray70", "firebrick")) +
-  labs(x = "Fragment Size (bp)",
-       y = "ALS - Control (Mean Count Difference) (×10⁶)",
-       title = "Fragment Size Profile Differences") +
-  theme_pubr() +
-  theme(legend.position = "none")
-
-ggsave("figures/fragment_size_differnces_ALSvsCT.png", fragment_diff, 
-       width = 12, height = 5, dpi = 300, bg = "white")
-fragment_diff
-```
-
 ### Short-to-Long Fragment Ratio Analysis
 
-Fragment size distributions in cfDNA are shaped by nucleosomal protection and degradation dynamics. Short fragments (~110–150 bp) typically arise from apoptotic cleavage, while longer fragments (~200–600 bp) may reflect alternative forms of cell death or reduced chromatin degradation. The relative abundance of these fragment classes can provide insight into underlying biological processes.
+Fragment size distributions in cfDNA are shaped by nucleosomal protection and degradation dynamics. Short fragments (~110–150 bp) typically originate from apoptotic cleavage, while longer fragments (~200–600 bp) may reflect alternative modes of cell death or reduced chromatin degradation. The relative abundance of these fragment populations can provide insight into underlying biological processes.
 
-In this section, the abundance of short and long fragments was quantified per sample. The short-to-long fragment ratio was calculated and compared between ALS and control groups. All values were normalized per million fragments.
+Previous studies have proposed the short-to-long fragment ratio as a potential biomarker in cfDNA-based analyses. Therefore, in this section, the abundance of short and long fragments was quantified for each sample, and the corresponding short-to-long fragment ratio was calculated. All values were normalized per million fragments and compared between ALS and control groups.
 
 ```{r, include=FALSE}
 # Define fragment ranges
-short_range <- c(110, 150)  # Short fragments
-long_range <- c(200, 600)   # Long fragments (avoiding overlap)
+short_range <- c(120, 150)  # Short fragments
+long_range <- c(250, 600)   # Long fragments (avoiding overlap)
 
 # Calculate normalized counts and ratio
 fragment_metrics <- fragment_data %>%
@@ -284,6 +354,113 @@ fragment_pheno_summary <- fragment_als %>%
 head(fragment_pheno_summary)
 ```
 
+## Nucleosome Peak Abundance Analysis (Bulbar vs Spinal onset ALS)
+
+```{r}
+# Nucleosome Peak Abundance Analysis
+# This script identifies peak nucleosome fragment sizes in different ranges 
+# and compares their abundance between conditions (ALS vs Control)
+
+## Define nucleosome size ranges
+# We analyze three nucleosome configurations:
+ranges <- list(
+  "Mono" = c(120, 170),   # Mononucleosomes (core particle + short linker)
+  "Di"   = c(280, 350),   # Dinucleosomes
+  "Tri"  = c(430, 600)    # Trinucleosomes
+)
+
+## Find peak abundances for each condition and range
+
+peaks_by_pheno <- lapply(names(ranges), function(r) {
+  fragment_pheno_summary %>%
+    filter(insert_size >= ranges[[r]][1], insert_size <= ranges[[r]][2]) %>%
+    group_by(ALS_Phenotype) %>%
+    slice_max(mean_count, n = 1, with_ties = FALSE) %>%
+    mutate(Nucleosome_Type = r) %>%
+    select(ALS_Phenotype, Nucleosome_Type, insert_size, mean_count, sd_count)
+}) %>% bind_rows()
+
+## 3. Test (Wilcoxon)
+stat_results_ALS <- lapply(names(ranges), function(nuc) {
+  range <- ranges[[nuc]]
+  test <- fragment_pheno_summary %>%
+    filter(insert_size >= range[1], insert_size <= range[2]) %>%
+    wilcox.test(mean_count ~ ALS_Phenotype, data = ., exact = FALSE)
+  data.frame(Nucleosome_Type = nuc, p_value = test$p.value)
+}) %>% bind_rows() %>%
+  mutate(p_value = ifelse(p_value < 0.001, "< 0.001", round(p_value, 3)))
+
+## 4. summary by nucleosome and condition
+table_data_ALS <- peaks_by_pheno %>%
+  mutate(Count_SD = paste0(round(mean_count, 2), " (", round(sd_count, 2), ")")) %>%
+  select(Nucleosome_Type, ALS_Phenotype, Count_SD) %>%
+  pivot_wider(names_from = ALS_Phenotype, values_from = Count_SD) %>%
+  left_join(stat_results_ALS, by = "Nucleosome_Type") %>%
+  select(Nucleosome_Type, Bulbar, Spinal, p_value)
+
+## 5. table
+table_data_ALS %>%
+  kable("latex",
+        booktabs = TRUE,
+        col.names = c("Nucleosome Type", "Bulbar", "Spinal", "p-value"),
+        caption = "Table 1. Summary of peak nucleosome-associated cfDNA fragment counts by ALS phenotype.") %>%
+  kableExtra::kable_styling(latex_options = c("hold_position", "striped"))
+
+```
+
+```{r}
+##  Boxplot visualization
+
+fragment_plot_data_ALS <- fragment_pheno_summary %>%
+  filter(insert_size >= 120 & insert_size <= 600) %>%
+  mutate(Nucleosome_Type = case_when(
+    insert_size >= 120 & insert_size <= 170 ~ "Mono",
+    insert_size >= 280 & insert_size <= 350 ~ "Di",
+    insert_size >= 430 & insert_size <= 600 ~ "Tri",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(Nucleosome_Type))
+
+fragment_plot_data_scaled_ALS <- fragment_plot_data_ALS %>%
+  mutate(mean_count_scaled = mean_count / 10000)
+
+plot_nuc_type_scaled <- function(nuc_type) {
+  df <- fragment_plot_data_scaled_ALS %>% filter(Nucleosome_Type == nuc_type)
+  
+  ggplot(df, aes(x = ALS_Phenotype, y = mean_count_scaled, fill = ALS_Phenotype)) +
+    geom_boxplot(width = 0.6, alpha = 0.8) +
+    stat_compare_means(method = "wilcox.test", label = "p.signif", size = 5) +
+    labs(
+      title = paste0(nuc_type, "-nucleosome"),
+      x = NULL,
+      y = "Fragment Count (x10^4)"
+    ) +
+    scale_fill_brewer(palette = "Set1") +
+    theme_minimal(base_size = 14) +
+    theme(
+      plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+      legend.position = "none",
+      plot.margin = margin(10, 10, 10, 10)
+    )
+}
+
+p_mono <- plot_nuc_type_scaled("Mono")
+p_di   <- plot_nuc_type_scaled("Di")
+p_tri  <- plot_nuc_type_scaled("Tri")
+
+final_plot_ALS <- ggarrange(p_mono, p_di, p_tri,
+                        ncol = 3,
+                        labels = c("A", "B", "C"),
+                        align = "v")
+
+print(final_plot_ALS)
+ggsave("figures/Nucleosome_Peak_Abundance_BvsS.png", final_plot_ALS, 
+       width = 8, height = 5, dpi = 300, bg = "white")
+
+```
+Figure 2. Nucleosome-associated cfDNA fragment abundance across conditions.
+Boxplots show the distribution of cfDNA fragment counts within mono- (A), di- (B), and tri-nucleosome (C) size ranges. Comparisons are shown between Bulbar and Spinal.Fragment counts are scaled by 10⁴ for visualization. Statistical comparisons were performed using the Wilcoxon rank-sum test; significance levels are indicated as follows: p < 0.05 (), p < 0.01 (), p < 0.001 (), and p < 0.0001 (****). 
+
 ### Fragment Size Distribution by ALS Phenotype
 
 ```{r, fig.cap="Fragment size distribution in bulbar- vs spinal-onset ALS", echo=FALSE}
@@ -320,19 +497,27 @@ fragment_plot_ALS <- ggplot(fragment_pheno_summary, aes(x = insert_size, y = mea
     expand = expansion(mult = c(0, 0.05))  # Add small padding at top
   ) +
   # Nucleosome markers with improved positioning
-  geom_vline(xintercept = c(147, 320), linetype = "dotted", alpha = 0.5, linewidth = 0.5) +
+  geom_vline(xintercept = c(147, 313,504), linetype = "dotted", alpha = 0.5, linewidth = 0.5) +
   annotate("text", x = 147, y = max(fragment_summary$mean_count/10^6)*0.95, 
            label = "Mono-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8) +
-  annotate("text", x = 320, y = max(fragment_summary$mean_count/10^6)*0.95, 
+    annotate("rect", xmin = 120, xmax = 170, ymin = 0, ymax = Inf,
+              fill = "yellow", alpha = 0.05, color = NA)+
+  annotate("text", x = 313, y = max(fragment_summary$mean_count/10^6)*0.95, 
            label = "Di-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8)+
-  annotate("text", x = 90, y = 2.5, 
-           label = "Short fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 0.8) +
-  annotate("rect", xmin = 110, xmax = 150, ymin = 0, ymax = Inf,
-             fill = "yellow", alpha = 0.05, color = NA)+
-  annotate("text", x = 240, y =2.5, 
-           label = "Long fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 1.5) +
-  annotate("rect", xmin = 180, xmax = 600, ymin = 0, ymax = Inf,
-             fill = "cyan", alpha = 0.05, color = NA)
+      annotate("rect", xmin = 280, xmax = 350, ymin = 0, ymax = Inf,
+              fill = "yellow", alpha = 0.05, color = NA)+
+  annotate("text", x = 504, y = max(fragment_summary$mean_count/10^6)*0.95, 
+           label = "Tri-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8)+
+      annotate("rect", xmin = 430, xmax = 600, ymin = 0, ymax = Inf,
+              fill = "yellow", alpha = 0.05, color = NA)
+#  annotate("text", x = 90, y = 2.5, 
+#           label = "Short fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 0.8) +
+#  annotate("rect", xmin = 110, xmax = 150, ymin = 0, ymax = Inf,
+#             fill = "yellow", alpha = 0.05, color = NA)+
+#  annotate("text", x = 240, y =2.5, 
+#           label = "Long fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 1.5) +
+#  annotate("rect", xmin = 180, xmax = 600, ymin = 0, ymax = Inf,
+#             fill = "cyan", alpha = 0.05, color = NA)
 
 # Save the plot
 ggsave("figures/fragment_size_distribution_BulbarvsSpinal.png", fragment_plot_ALS, 
@@ -340,76 +525,19 @@ ggsave("figures/fragment_size_distribution_BulbarvsSpinal.png", fragment_plot_AL
 print(fragment_plot_ALS)
 ```
 
-### Statistical Comparison
-
-Wilcoxon tests were conducted for each fragment size bin (5 bp resolution) to identify bins with significant differences between bulbar and spinal-onset ALS patients.
-
-```{r, include=FALSE}
-bin_size <- 5
-pheno_bin_stats <- fragment_als %>%
-  mutate(
-    bin = cut(
-      insert_size,
-      breaks = seq(0, 600, by = bin_size),
-      labels = paste0(seq(0, 600 - bin_size, by = bin_size), "-", seq(bin_size, 600, by = bin_size)),
-      include.lowest = TRUE
-    )
-  ) %>%
-  group_by(bin) %>%
-  summarise(
-    mean_bulbar = mean(count[ALS_Phenotype == "Bulbar"]),
-    mean_spinal = mean(count[ALS_Phenotype == "Spinal"]),
-    mean_diff = mean_bulbar - mean_spinal,
-    p.value = wilcox.test(count ~ ALS_Phenotype, exact = FALSE)$p.value,
-    .groups = "drop"
-  ) %>%
-  mutate(
-    bin_start = as.numeric(str_extract(bin, "^\\d+")),
-    bin_end = as.numeric(str_extract(bin, "\\d+$")),
-    bin_mid = (bin_start + bin_end) / 2
-  )
 
 
-```
 
-### Significant Bins
 
-The top 10 most differential bins are presented below (sorted by nominal p-value):
-
-```{r, echo=FALSE}
-pheno_bin_stats %>% arrange(p.value) %>% head(10) %>% kable(digits = 4, caption = "Top 10 Most Differential Fragment Size Bins")
-```
-
-The following plot highlights insert size bins showing the greatest differences between bulbar-onset and spinal-onset ALS samples. Blue bars indicate bins with nominal statistical significance (p < 0.05).
-
-```{r, fig.cap="Fragment size differences between bulbar and spinal ALS", echo=FALSE}
-pheno_diff_plot <- ggplot(pheno_bin_stats, aes(x = bin_mid, y = mean_diff/10^6)) +
-  geom_col(aes(fill = p.value < 0.15), width = bin_size * 0.8) +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  scale_fill_manual(values = c("gray70", "darkblue")) +
-  labs(
-    x = "Fragment Size (bp)",
-    y = "Bulbar - Spinal (Mean Count Difference) (×10⁶)",
-    title = "Phenotype-Specific Fragmentation Differences"
-  ) +
-  theme_pubr() +
-  theme(legend.position = "none")
-
-ggsave("figures/fragment_size_differnces_BulbarvsSpinal.png", pheno_diff_plot, 
-       width = 12, height = 5, dpi = 300, bg = "white")
-
-pheno_diff_plot
-```
-This plot illustrates the mean count differences in cfDNA fragment sizes between bulbar- and spinal-onset ALS patients. A prominent peak is observed around 150–170 bp, indicating a higher abundance of short mononucleosomal fragments in the bulbar group. In contrast, a relative depletion of longer fragments (approximately 320–400 bp) is apparent in bulbar-onset cases.
 
 ### Short-to-Long Fragment Ratio Analysis
 
-As described in Section 2.3, the short-to-long fragment ratio was also evaluated within the ALS group to compare ALS phenotypes, aiming to explore potential differences in fragmentation patterns associated with clinical presentation.
+As described previous sections, the short-to-long fragment ratio was also evaluated within the ALS group to compare ALS phenotypes, aiming to explore potential differences in fragmentation patterns associated with clinical presentation.
 
 ```{r, include=FALSE}
 # Define fragment ranges
-short_range <- c(110, 150)  # Short fragments
-long_range <- c(200, 600)   # Long fragments (avoiding overlap)
+short_range <- c(120, 150)  # Short fragments
+long_range <- c(250, 600)   # Long fragments (avoiding overlap)
 
 # Calculate metrics for each sample
 fragment_metrics_ALS <- fragment_data %>%
@@ -476,10 +604,14 @@ These results suggest a potential shift in cfDNA fragmentation profiles associat
 
 # Summary and Interpretation
 
-The cfDNA fragmentation analysis between ALS patients and healthy controls showed consistent nucleosomal fragmentation patterns in both groups. ALS samples exhibited a non-significant trend toward a higher abundance of short fragments and lower abundance of long fragments, resulting in an increased short-to-long fragment ratio. These trends align with the hypothesis of enhanced apoptotic cfDNA release in ALS, although no statistically significant differences were detected at the group level.
+Nucleosomal cfDNA fragmentation patterns were assessed in ALS patients and healthy controls. No significant differences were observed in mononucleosomal fragment abundance between groups; however, ALS samples showed significantly lower levels of di- and tri-nucleosomal fragments, suggesting enhanced cfDNA fragmentation or altered chromatin processing in ALS.
 
-Within the ALS cohort, the comparison between bulbar- and spinal-onset phenotypes revealed more pronounced differences. Bulbar-onset patients showed significantly lower long fragment abundance and higher short-to-long ratios compared to spinal-onset cases. This suggests potential phenotype-specific differences in cfDNA release dynamics, which may reflect underlying pathophysiological processes. However, given the limited sample size (n = 4 per group), these findings must be interpreted with caution and require validation in larger cohorts.
+In line with these findings, ALS samples also exhibited a non-significant trend toward a higher abundance of short fragments and a reduced abundance of long fragments, resulting in an increased short-to-long fragment ratio. Although this difference was not statistically significant, it is consistent with a shift toward apoptotic cfDNA release in ALS.
+
+Within the ALS cohort, the comparison between bulbar- and spinal-onset phenotypes revealed more pronounced differences in cfDNA fragmentation. Bulbar-onset patients exhibited significantly lower levels of mono-, di-, and tri-nucleosomal fragments compared to spinal-onset cases (e.g., mononucleosomes: p = 0.014), along with higher short-to-long fragment ratios. These findings suggest potential phenotype-specific differences in cfDNA release or degradation dynamics that may reflect distinct pathophysiological mechanisms. However, due to the limited sample size (n = 4 per group), these results should be interpreted with caution and confirmed in larger cohorts.
 
 # Conclusion
 
-This study provides a preliminary characterization of cfDNA fragmentation patterns in ALS plasma samples using EM-seq data. While no statistically significant differences were observed between ALS and control groups, phenotype-specific trends within the ALS cohort suggest that cfDNA fragmentation metrics, particularly the short-to-long ratio, may offer biologically relevant insights. These findings support further investigation in larger, independent cohorts to assess their robustness and potential utility as biomarkers in ALS.
+This study provides a preliminary characterization of cfDNA fragmentation patterns in ALS plasma samples using EM-seq data. Although no significant differences were detected between ALS and control groups in overall fragmentation metrics, a selective reduction in di- and tri-nucleosomal fragments was observed in ALS samples, suggesting increased cfDNA degradation or altered chromatin processing.
+
+Within the ALS cohort, phenotype-specific differences were more evident: bulbar-onset patients showed significantly lower nucleosome-associated fragment abundance and higher short-to-long ratios compared to spinal-onset cases. These findings point to potential differences in cfDNA release dynamics linked to disease phenotype. Overall, the results support further investigation in larger, independent cohorts to evaluate the robustness and biomarker potential of cfDNA fragmentation features in ALS.
