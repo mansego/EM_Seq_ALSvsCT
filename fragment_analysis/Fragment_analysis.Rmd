@@ -1,0 +1,485 @@
+
+---
+title: "cfDNA Fragmentation Analysis in ALS and Control Plasma Samples"
+author: "ML Mansego"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    code_folding: hide
+    theme: readable
+  pdf_document:
+    toc: true
+    toc_depth: '2'
+    latex_engine: xelatex
+---
+
+# Introduction
+
+Cell-free DNA (cfDNA) in plasma originates predominantly from apoptotic and necrotic cellular processes. The resulting fragmentation pattern reflects nucleosomal architecture and chromatin accessibility, providing valuable insights into tissue-specific cell death and disease-associated molecular changes. In the context of amyotrophic lateral sclerosis (ALS), cfDNA has emerged as a potential non-invasive biomarker under active investigation. Fragmentation characteristics—particularly insert size distributions—may capture signals related to disease-specific cell turnover, inflammatory processes, or epigenomic alterations.
+
+The present analysis investigates differences in cfDNA fragmentation patterns between ALS patients and healthy controls, based on insert size distributions derived from EM-seq data. Fragment size profiles are quantified using insert size metrics obtained through Picard tools and compared across groups to identify disease-associated patterns.
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "/mnt/mydisk/EM_Seq_ALSvsCT/fragment_analysis/")
+library(tidyverse)
+library(knitr)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggpubr)
+```
+
+# Metadata Loading
+
+The sample metadata, including subject ID, condition (ALS or control), age, gender, and ALS phenotype (bulbar or spinal, for patients only), is imported and used to stratify insert size data.
+
+```{r, include=FALSE}
+sample_metadata <- read_csv("../pData/pData_ALSvsCT.csv") %>%
+  select(Sample_ID, Condition, Gender, Age, ALS_Phenotype) 
+```
+
+# Insert Size Analysis
+
+## Extraction and Preprocessing
+
+Insert size data were extracted from Picard output files. Only fragment lengths ≤ 600 bp were retained for biological relevance. These lengths encompass mono- (~147 bp) and di-nucleosome (~320 bp) structures, typical of apoptotic DNA fragmentation.
+
+```{r, include=FALSE}
+load_fragment_data <- function(file, sample_id) {
+  read_delim(file, delim = "\t", comment = "##", skip = 10,
+             col_names = c("insert_size", "count")) %>%
+    filter(insert_size != "insert_size") %>%
+    mutate(
+      Sample_ID = sample_id,
+      insert_size = as.integer(insert_size),
+      count = as.integer(count)
+    )
+}
+picard_dir <- "stats/"
+fragment_data <- map_df(sample_metadata$Sample_ID, function(id) {
+  load_fragment_data(paste0(picard_dir, id, "_insert_metrics.txt"), id)
+}) %>%
+  left_join(sample_metadata, by = "Sample_ID")
+
+fragment_summary <- fragment_data %>%
+  filter(insert_size <= 600) %>%
+  group_by(Condition, insert_size) %>%
+  summarise(
+    mean_count = mean(count),
+    sd_count = sd(count),
+    n = n(),
+    se_count = sd_count / sqrt(n),
+    .groups = "drop"
+  )
+
+head(fragment_summary)
+```
+
+## Visualization of Fragment Size Distribution
+
+The mean insert size distribution per group is shown below. Shaded ribbons represent ±1 standard error. Vertical dashed lines indicate mono- and di-nucleosome boundaries. Additionally, yellow and blue shaded areas highlight the short (110–150 bp) and long (=>180 bp) fragment ranges, respectively.
+
+```{r, fig.cap="Mean fragment size distribution by group", echo=FALSE, message=FALSE, warning=FALSE}
+fragment_plot <- ggplot(fragment_summary, aes(x = insert_size, y = mean_count/10^6, 
+                                              color = Condition, fill = Condition)) +
+  geom_ribbon(
+    aes(ymin = (mean_count - se_count)/10^6, ymax = (mean_count + se_count)/10^6),
+    alpha = 0.2, color = NA
+  ) +
+  geom_line(linewidth = 1, alpha = 0.8) +
+  scale_color_manual(values = c("Control" = "#4E79A7", "ALS" = "#E15759")) +
+  scale_fill_manual(values = c("Control" = "#4E79A7", "ALS" = "#E15759")) +
+  labs(
+    title = "Fragment Size Distribution in Plasma cfDNA",
+    subtitle = "Shaded regions represent ±1 standard error",
+    x = "Fragment Size (bp)",
+    y = "Normalized Fragment Count (×10⁶)",
+    caption = paste("n =", length(unique(fragment_data$Sample_ID)), "samples per group")
+  ) +
+  theme_pubr() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray40"),
+    panel.grid.major.y = element_line(color = "gray90"),
+    axis.text = element_text(size = 10)
+  ) +
+  scale_x_continuous(breaks = seq(0, 600, by = 50), limits = c(0, 600)) +
+  scale_y_continuous(labels = scales::comma) +
+  geom_vline(xintercept = c(147, 320), linetype = "dotted", alpha = 0.5) +
+  annotate("text", x = 147, y = max(fragment_summary$mean_count/10^6)*0.95, 
+           label = "Mono-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8) +
+  annotate("text", x = 320, y = max(fragment_summary$mean_count/10^6)*0.95, 
+           label = "Di-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8)+
+  annotate("text", x = 90, y = 2.5, 
+           label = "Short fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 0.8) +
+  annotate("rect", xmin = 110, xmax = 150, ymin = 0, ymax = Inf,
+             fill = "yellow", alpha = 0.05, color = NA)+
+  annotate("text", x = 240, y =2.5, 
+           label = "Long fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 1.5) +
+  annotate("rect", xmin = 180, xmax = 600, ymin = 0, ymax = Inf,
+             fill = "cyan", alpha = 0.05, color = NA)
+
+
+# Save the plot
+ggsave("figures/fragment_size_distribution_ALSvsCT.png", fragment_plot, 
+       width = 8, height = 5, dpi = 300, bg = "white")
+print(fragment_plot)
+```
+
+## Fragment Size Differences by Group (ALS vs Control)
+
+To assess differential fragmentation, insert sizes were binned in 5 bp intervals. For each bin, a Wilcoxon rank-sum test was applied to evaluate count differences between ALS and control groups.
+
+```{r, include=FALSE}
+bin_size <- 5
+plot_data <- fragment_data %>%
+  filter(insert_size <= 600) %>% 
+  mutate(
+    bin = cut(
+      insert_size,
+      breaks = seq(0, 600, by = bin_size),
+      labels = paste0(seq(0, 600 - bin_size, by = bin_size), "-", seq(bin_size, 600, by = bin_size)),
+      include.lowest = TRUE
+    )
+  ) %>%
+  group_by(bin) %>%
+  summarise(
+    mean_ALS = mean(count[Condition == "ALS"]),
+    mean_Control = mean(count[Condition == "Control"]),
+    mean_diff = mean_ALS - mean_Control,
+    p.value = wilcox.test(count ~ Condition, alternative = "greater", exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    bin_start = as.numeric(str_extract(bin, "^\\d+")),
+    bin_end = as.numeric(str_extract(bin, "\\d+$")),
+    bin_mid = (bin_start + bin_end) / 2
+  )
+```
+
+### Significant Bins
+
+The top 10 most differential bins are presented below (sorted by nominal p-value):
+
+```{r, echo=FALSE}
+plot_data %>% arrange(p.value) %>% head(10) %>% kable(digits = 4, caption = "Top 10 Most Differential Fragment Size Bins")
+```
+
+### Differential Fragmentation Plot
+
+The following plot highlights insert size bins where ALS samples differ most from controls. Red bars indicate bins with nominal significance (p < 0.15).
+
+```{r, fig.cap="Differential fragment size profile", echo=FALSE}
+fragment_diff <- ggplot(plot_data, aes(x = bin_mid, y = mean_diff/10^6)) +
+  geom_col(aes(fill = p.value < 0.15), width = bin_size*0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("gray70", "firebrick")) +
+  labs(x = "Fragment Size (bp)",
+       y = "ALS - Control (Mean Count Difference) (×10⁶)",
+       title = "Fragment Size Profile Differences") +
+  theme_pubr() +
+  theme(legend.position = "none")
+
+ggsave("figures/fragment_size_differnces_ALSvsCT.png", fragment_diff, 
+       width = 12, height = 5, dpi = 300, bg = "white")
+fragment_diff
+```
+
+### Short-to-Long Fragment Ratio Analysis
+
+Fragment size distributions in cfDNA are shaped by nucleosomal protection and degradation dynamics. Short fragments (~110–150 bp) typically arise from apoptotic cleavage, while longer fragments (~200–600 bp) may reflect alternative forms of cell death or reduced chromatin degradation. The relative abundance of these fragment classes can provide insight into underlying biological processes.
+
+In this section, the abundance of short and long fragments was quantified per sample. The short-to-long fragment ratio was calculated and compared between ALS and control groups. All values were normalized per million fragments.
+
+```{r, include=FALSE}
+# Define fragment ranges
+short_range <- c(110, 150)  # Short fragments
+long_range <- c(200, 600)   # Long fragments (avoiding overlap)
+
+# Calculate normalized counts and ratio
+fragment_metrics <- fragment_data %>%
+  group_by(Sample_ID, Condition) %>%
+  summarize(
+    short_count = sum(count[between(insert_size, short_range[1], short_range[2])]),
+    long_count = sum(count[insert_size >= long_range[1] & insert_size <= long_range[2]]),
+    total_count = sum(count),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    short_norm = short_count /  10^6,
+    long_norm = long_count /  10^6,
+    ratio_sl = short_norm / long_norm
+  ) %>%
+  pivot_longer(
+    cols = c(short_norm, long_norm, ratio_sl),
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  mutate(
+    metric = factor(metric, 
+                    levels = c("short_norm", "long_norm", "ratio_sl"),
+                    labels = c(paste("Short", short_range[1], "-", short_range[2], "bp"),
+                               paste("Long", long_range[1], "-", long_range[2], "bp"),
+                               "Short/Long Ratio"))
+  )
+```
+
+#### Distribution of Short-to-Long Ratios
+
+```{r, fig.cap="Short-to-long fragment ratio by condition", echo=FALSE}
+short_to_long <- ggplot(fragment_metrics, aes(x = Condition, y = value, fill = Condition)) +
+  geom_violin(alpha = 0.7, trim = FALSE) +
+  geom_boxplot(width = 0.2, fill = "white", outlier.shape = NA) +
+  geom_jitter(width = 0.1, size = 1.5, alpha = 0.5) +
+  stat_compare_means(
+    method = "wilcox.test",
+    comparisons = list(c("Control", "ALS")),
+    label = "p.format"
+  ) +
+  scale_fill_manual(values = c("ALS" = "#E15759", "Control" = "#4E79A7")) +
+  labs(
+    x = NULL,
+    y = "Normalized Count or Ratio",
+    title = "Fragment Size Distribution"
+  ) +
+  facet_wrap(~metric, scales = "free_y", ncol = 3) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",
+    strip.text = element_text(face = "bold"),
+    panel.spacing = unit(1, "lines")
+  )
+
+# Save and print plot
+ggsave("figures/short-to-long_ratio_ALSvsCT.png", short_to_long, 
+       width = 12, height = 5, dpi = 300, bg = "white")
+
+print(short_to_long)
+```
+
+ALS samples showed a non-significant trend toward higher abundance of short fragments and reduced levels of long fragments compared to controls. Consequently, the short-to-long ratio appeared slightly elevated in the ALS group. While these tendencies are biologically plausible—potentially reflecting increased apoptotic cfDNA release—they did not reach statistical significance and should be interpreted with caution.
+
+## Fragmentation Differences Between Bulbar- and Spinal-Onset ALS
+
+Within the ALS group, patients can present distinct onset phenotypes: bulbar or spinal. These phenotypes may reflect different neurodegenerative mechanisms and progression patterns. Here, we examine whether cfDNA fragmentation differs between bulbar- and spinal-onset ALS patients.
+
+```{r, include=FALSE}
+# Subset only ALS patients with phenotype data
+fragment_als <- fragment_data %>%
+  filter(Condition == "ALS", !is.na(ALS_Phenotype), insert_size <= 600)
+
+# Summarize insert size counts by phenotype
+fragment_pheno_summary <- fragment_als %>%
+  group_by(ALS_Phenotype, insert_size) %>%
+  summarise(
+    mean_count = mean(count),
+    sd_count = sd(count),
+    n = n(),
+    se_count = sd_count / sqrt(n),
+    .groups = "drop"
+  )
+head(fragment_pheno_summary)
+```
+
+### Fragment Size Distribution by ALS Phenotype
+
+```{r, fig.cap="Fragment size distribution in bulbar- vs spinal-onset ALS", echo=FALSE}
+fragment_plot_ALS <- ggplot(fragment_pheno_summary, aes(x = insert_size, y = mean_count/10^6, 
+                                              color = ALS_Phenotype, fill = ALS_Phenotype)) +
+  geom_ribbon(
+    aes(ymin = (mean_count - se_count)/10^6, ymax = (mean_count + se_count)/10^6),
+    alpha = 0.2, color = NA, linewidth = 0  # Updated to linewidth
+  ) +
+  geom_line(linewidth = 1, alpha = 0.8) +  # Updated to linewidth
+  scale_color_manual(values = c("Spinal" = "#4E79A7", "Bulbar" = "#E15759")) +
+  scale_fill_manual(values = c("Spinal" = "#4E79A7", "Bulbar" = "#E15759")) +
+  #scale_color_jco() +
+  #scale_fill_jco() +
+  labs(
+    title = "Fragment Size Distribution in Plasma cfDNA in Bulbar vs Spinal ALS",
+    subtitle = "Shaded regions represent ±1 standard error",
+    x = "Fragment Size (bp)",
+    y = "Normalized Fragment Count (×10⁶)",
+    caption = paste("n =", length(unique(fragment_data$Sample_ID)), "samples per group")
+  ) +
+  theme_pubr() +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray40"),
+    panel.grid.major.y = element_line(color = "gray90", linewidth = 0.2),  # Updated
+    panel.grid.minor.y = element_blank(),  # Cleaner appearance
+    axis.text = element_text(size = 10)
+  ) +
+  scale_x_continuous(breaks = seq(0, 600, by = 50), limits = c(0, 600)) +  # Added limits
+  scale_y_continuous(
+    labels = function(x) format(x, big.mark = ",", scientific = FALSE),
+    expand = expansion(mult = c(0, 0.05))  # Add small padding at top
+  ) +
+  # Nucleosome markers with improved positioning
+  geom_vline(xintercept = c(147, 320), linetype = "dotted", alpha = 0.5, linewidth = 0.5) +
+  annotate("text", x = 147, y = max(fragment_summary$mean_count/10^6)*0.95, 
+           label = "Mono-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8) +
+  annotate("text", x = 320, y = max(fragment_summary$mean_count/10^6)*0.95, 
+           label = "Di-\nnucleosome", angle = 90, vjust = 1.5, size = 3.5, lineheight = 0.8)+
+  annotate("text", x = 90, y = 2.5, 
+           label = "Short fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 0.8) +
+  annotate("rect", xmin = 110, xmax = 150, ymin = 0, ymax = Inf,
+             fill = "yellow", alpha = 0.05, color = NA)+
+  annotate("text", x = 240, y =2.5, 
+           label = "Long fragment", angle = 0, vjust = 1, size = 3.5, lineheight = 1.5) +
+  annotate("rect", xmin = 180, xmax = 600, ymin = 0, ymax = Inf,
+             fill = "cyan", alpha = 0.05, color = NA)
+
+# Save the plot
+ggsave("figures/fragment_size_distribution_BulbarvsSpinal.png", fragment_plot_ALS, 
+       width = 8, height = 5, dpi = 300, bg = "white")
+print(fragment_plot_ALS)
+```
+
+### Statistical Comparison
+
+Wilcoxon tests were conducted for each fragment size bin (5 bp resolution) to identify bins with significant differences between bulbar and spinal-onset ALS patients.
+
+```{r, include=FALSE}
+bin_size <- 5
+pheno_bin_stats <- fragment_als %>%
+  mutate(
+    bin = cut(
+      insert_size,
+      breaks = seq(0, 600, by = bin_size),
+      labels = paste0(seq(0, 600 - bin_size, by = bin_size), "-", seq(bin_size, 600, by = bin_size)),
+      include.lowest = TRUE
+    )
+  ) %>%
+  group_by(bin) %>%
+  summarise(
+    mean_bulbar = mean(count[ALS_Phenotype == "Bulbar"]),
+    mean_spinal = mean(count[ALS_Phenotype == "Spinal"]),
+    mean_diff = mean_bulbar - mean_spinal,
+    p.value = wilcox.test(count ~ ALS_Phenotype, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    bin_start = as.numeric(str_extract(bin, "^\\d+")),
+    bin_end = as.numeric(str_extract(bin, "\\d+$")),
+    bin_mid = (bin_start + bin_end) / 2
+  )
+
+
+```
+
+### Significant Bins
+
+The top 10 most differential bins are presented below (sorted by nominal p-value):
+
+```{r, echo=FALSE}
+pheno_bin_stats %>% arrange(p.value) %>% head(10) %>% kable(digits = 4, caption = "Top 10 Most Differential Fragment Size Bins")
+```
+
+The following plot highlights insert size bins showing the greatest differences between bulbar-onset and spinal-onset ALS samples. Blue bars indicate bins with nominal statistical significance (p < 0.05).
+
+```{r, fig.cap="Fragment size differences between bulbar and spinal ALS", echo=FALSE}
+pheno_diff_plot <- ggplot(pheno_bin_stats, aes(x = bin_mid, y = mean_diff/10^6)) +
+  geom_col(aes(fill = p.value < 0.15), width = bin_size * 0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(values = c("gray70", "darkblue")) +
+  labs(
+    x = "Fragment Size (bp)",
+    y = "Bulbar - Spinal (Mean Count Difference) (×10⁶)",
+    title = "Phenotype-Specific Fragmentation Differences"
+  ) +
+  theme_pubr() +
+  theme(legend.position = "none")
+
+ggsave("figures/fragment_size_differnces_BulbarvsSpinal.png", pheno_diff_plot, 
+       width = 12, height = 5, dpi = 300, bg = "white")
+
+pheno_diff_plot
+```
+This plot illustrates the mean count differences in cfDNA fragment sizes between bulbar- and spinal-onset ALS patients. A prominent peak is observed around 150–170 bp, indicating a higher abundance of short mononucleosomal fragments in the bulbar group. In contrast, a relative depletion of longer fragments (approximately 320–400 bp) is apparent in bulbar-onset cases.
+
+### Short-to-Long Fragment Ratio Analysis
+
+As described in Section 2.3, the short-to-long fragment ratio was also evaluated within the ALS group to compare ALS phenotypes, aiming to explore potential differences in fragmentation patterns associated with clinical presentation.
+
+```{r, include=FALSE}
+# Define fragment ranges
+short_range <- c(110, 150)  # Short fragments
+long_range <- c(200, 600)   # Long fragments (avoiding overlap)
+
+# Calculate metrics for each sample
+fragment_metrics_ALS <- fragment_data %>%
+  filter(Condition != "Control") %>%
+  group_by(Sample_ID, ALS_Phenotype) %>%
+  summarize(
+    short_count = sum(count[between(insert_size, short_range[1], short_range[2])]),
+    long_count = sum(count[insert_size >= long_range[1] & insert_size <= long_range[2]]),
+    total_count = sum(count),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    short_norm = short_count / total_count * 10^6,
+    long_norm = long_count / total_count * 10^6,
+    ratio_sl = short_norm / long_norm  # Short/Long ratio
+  ) %>%
+  pivot_longer(
+    cols = c(short_norm, long_norm, ratio_sl),
+    names_to = "metric",
+    values_to = "value"
+  ) %>%
+  mutate(
+    metric = factor(metric, 
+                    levels = c("short_norm", "long_norm", "ratio_sl"),
+                    labels = c(paste("Short", short_range[1], "-", short_range[2], "bp"),
+                               paste("Long", long_range[1], "-", long_range[2], "bp"),
+                               "Short/Long Ratio"))
+  )
+
+# Create combined plot
+short_to_long_BvsS<-ggplot(fragment_metrics_ALS, aes(x = ALS_Phenotype, y = value, fill = ALS_Phenotype)) +
+  geom_violin(alpha = 0.7, trim = FALSE) +
+  geom_boxplot(width = 0.2, fill = "white", outlier.shape = NA) +
+  geom_jitter(width = 0.1, size = 1.5, alpha = 0.5) +
+  stat_compare_means(
+    method = "wilcox.test",
+    comparisons = list(c("Spinal", "Bulbar")),
+    label = "p.format"
+  ) +
+  scale_fill_manual(values = c("Bulbar" = "#E15759", "Spinal" = "#4E79A7")) +
+  labs(
+    x = NULL,
+    y = "Normalized Count or Ratio",
+    title = "Fragment Size Distribution by ALS Phenotype"
+  ) +
+  facet_wrap(~metric, scales = "free_y", ncol = 3) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",
+    strip.text = element_text(face = "bold"),
+    panel.spacing = unit(1, "lines")
+  )
+
+# Save plot
+ggsave("figures/short-to-long_ratio_BulbarvsSpinal.png", short_to_long_BvsS, 
+       width = 12, height = 5, dpi = 300)
+
+print(short_to_long_BvsS)
+
+```
+In the comparison between ALS phenotypes, bulbar-onset samples showed a significantly higher short-to-long fragment ratio compared to spinal-onset cases (p = 0.029). This difference was driven by both an increased abundance of short fragments (p = 0.057) and a decreased abundance of long fragments (p = 0.029) in the bulbar group.
+
+These results suggest a potential shift in cfDNA fragmentation profiles associated with ALS clinical subtype. However, given the limited sample size (n = 4 per group), findings should be interpreted with caution and require validation in larger cohorts.
+
+# Summary and Interpretation
+
+The cfDNA fragmentation analysis between ALS patients and healthy controls showed consistent nucleosomal fragmentation patterns in both groups. ALS samples exhibited a non-significant trend toward a higher abundance of short fragments and lower abundance of long fragments, resulting in an increased short-to-long fragment ratio. These trends align with the hypothesis of enhanced apoptotic cfDNA release in ALS, although no statistically significant differences were detected at the group level.
+
+Within the ALS cohort, the comparison between bulbar- and spinal-onset phenotypes revealed more pronounced differences. Bulbar-onset patients showed significantly lower long fragment abundance and higher short-to-long ratios compared to spinal-onset cases. This suggests potential phenotype-specific differences in cfDNA release dynamics, which may reflect underlying pathophysiological processes. However, given the limited sample size (n = 4 per group), these findings must be interpreted with caution and require validation in larger cohorts.
+
+# Conclusion
+
+This study provides a preliminary characterization of cfDNA fragmentation patterns in ALS plasma samples using EM-seq data. While no statistically significant differences were observed between ALS and control groups, phenotype-specific trends within the ALS cohort suggest that cfDNA fragmentation metrics, particularly the short-to-long ratio, may offer biologically relevant insights. These findings support further investigation in larger, independent cohorts to assess their robustness and potential utility as biomarkers in ALS.

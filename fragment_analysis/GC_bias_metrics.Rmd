@@ -1,0 +1,87 @@
+---
+title: "GC Bias Analysis by Group"
+author: "ML Mansego"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "/mnt/mydisk/EM_Seq_ALSvsCT/fragment_analysis/")
+
+library(tidyverse)
+library(knitr)
+library(readr)
+library(dplyr)
+library(tidyr)
+```
+
+# 1. Load Metadata
+
+
+```{r}
+# Sample-to-group mapping
+sample_metadata <- read_csv("../pData/pData_ALSvsCT.csv") %>%
+  select(Sample_ID, Condition, Gender, Age, ALS_Phenotype) 
+
+head(sample_metadata)
+```
+
+# GC Bias Metrics
+## Read and combine GC bias data
+
+```{r}
+setwd("stats/")
+gc_files <- list.files("gc_bias_metrics", pattern = "_gc_bias_metrics.txt$", full.names = TRUE)
+
+read_gc <- function(file) {
+  lines <- readLines(file)
+  skip <- grep("^ACCUMULATION_LEVEL", lines) - 1
+  df <- read_tsv(file, skip = skip, col_types = cols())
+  df$sample <- gsub("_gc_bias_metrics.txt", "", basename(file))
+  return(df)
+}
+
+gc_data <- map_dfr(gc_files, read_gc)
+gc_data <- gc_data %>%
+  left_join(sample_metadata, by = "Sample_ID")
+head(gc_data)
+```
+
+## Plot mean GC bias curve by group
+
+```{r}
+gc_grouped <- gc_data %>%
+  group_by(group, `GC`) %>%
+  summarise(mean_norm_cov = mean(`NORMALIZED_COVERAGE`, na.rm = TRUE), .groups = "drop")
+
+ggplot(gc_grouped, aes(x = `GC`, y = mean_norm_cov, color = group)) +
+  geom_line(size = 1) +
+  labs(title = "GC Bias - Mean per Group",
+       x = "GC%", y = "Normalized Coverage (mean)") +
+  theme_minimal()
+```
+
+## Diferential GC%
+
+
+# 4. Summary
+
+
+
+
+## GC Bias Summary by Group
+Group	Mean GC %	Median GC %	Mean Normalized Coverage	SD Normalized Coverage
+
+```{r}
+gc_summary <- gc_data %>%
+  group_by(group) %>%
+  summarise(
+    mean_gc = mean(`GC`, na.rm = TRUE),
+    median_gc = median(`GC`, na.rm = TRUE),
+    mean_norm_cov = mean(`NORMALIZED_COVERAGE`, na.rm = TRUE),
+    sd_norm_cov = sd(`NORMALIZED_COVERAGE`, na.rm = TRUE)
+  )
+head(gc_summary)
+```
+
+
+This report presents the average GC bias profiles for the ALS and Control groups based on deduplicated BAM files. The summary statistics help in understanding the library quality and potential sequencing biases between the groups.
