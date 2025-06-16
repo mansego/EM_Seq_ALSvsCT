@@ -1,0 +1,2 @@
+chr	start	end	length	nCG	meanMethy1	meanMethy2	diff.Methy	areaStat	annot.symbol	annot.type
+chr1	147078251	147078461	211	5	0.167984153665677	0.491223092108212	-0.323238938442535	-39.920972021246	NA	hg38_genes_1to5kb

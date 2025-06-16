@@ -32,7 +32,7 @@ config <- list(
   work_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10",
   base_path = "/mnt/mydisk/EM_Seq_ALSvsCT/PrePro/bismark/methylation_call/methylation_coverage",
   snp_file = "/mnt/mydisk/EM_Seq_ALSvsCT/references/snp151Common.txt.gz",
-  output_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/Results"
+  output_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/Results/ALSvsCT/"
 )
 
 # Create directories if they don't exist
@@ -506,47 +506,10 @@ ggsave(file.path(config$output_dir, "QC_coverage_by_chr.png"), p_cov, width = 8,
 # 4.3.4. Clustering samples
 library(pheatmap)
 cor_matrix <- cor(meth, use = "pairwise.complete.obs")
-pheatmap(
-  cor_matrix,
-  clustering_method = "ward.D2",  # método de Ward
-  main = "Sample Clustering (Correlation)"
-)
-#option2
 dist_matrix <- as.dist(1 - cor_matrix)
-
-# Realizar clustering jerárquico
 hc <- hclust(dist_matrix, method = "ward.D2")
-
-# Graficar dendrograma
-plot(hc, main = "Sample Clustering (Ward.D2 + Correlation)", xlab = "")
-
-#option3
-library(ComplexHeatmap)
-
-Heatmap(
-  cor_matrix,
-  name = "Correlation",
-  clustering_method_columns = "ward.D2",
-  clustering_method_rows = "ward.D2",
-  col = circlize::colorRamp2(c(0, 0.5, 1), c("blue", "white", "red")),
-  column_title = "Sample Clustering"
-)
-
-cor_matrix <- cor(meth)
-plot(hclust(as.dist(1 - cor_matrix), method = "ward.D2"))
-
+p_feature<-plot(hc, main = "Sample Clustering (Ward.D2 + Correlation)", xlab = "")
 ggsave(file.path(config$output_dir, "QC_methylation_by_feature.png"), p_feature, width = 8, height = 6)
-
-library(ComplexHeatmap)
-
-Heatmap(
-  cor_matrix,
-  name = "Correlation",
-  clustering_method_columns = "ward.D2",
-  clustering_method_rows = "ward.D2",
-  col = circlize::colorRamp2(c(0, 0.5, 1), c("blue", "white", "red")),
-  column_title = "Sample Clustering"
-)
 
 # 4.3.4. Global Methylation by Condition
 

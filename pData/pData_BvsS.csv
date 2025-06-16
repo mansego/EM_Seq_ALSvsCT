@@ -1,0 +1,9 @@
+Sample,Sample_ID,Condition,Gender,Age,HTN,DM,HLD,Smoking,ALS_Phenotype,Onset_sympton,ALSFRSR,Progression_ratio,Batch
+ALS42,BACW_42,ALS,Female,76,Y,N,Y,N,Bulbar,1,36,0.46,L1-2
+ALS45,BACW_45,ALS,Male,72,N,N,N,Y,Bulbar,1,36,0.5,L1-2
+ALS47,BACW_47,ALS,Female,71,N,N,Y,N,Spinal,2,31,0.21,L1-2
+ALS50,BACW_50,ALS,Female,75,Y,N,Y,N,Bulbar,1,39,0.1,L1-2
+ALS53,BACW_53,ALS,Male,69,Y,N,N,Y,Spinal,3,44,0.23,L1-2
+ALS56,BACW_56,ALS,Male,68,N,N,N,N,Bulbar,1,45,0.26,L1-2
+ALS58,BACW_58,ALS,Male,68,N,N,N,N,Spinal,2,40,0.23,L1-2
+ALS65,BACW_65,ALS,Female,62,N,N,N,Y,Spinal,3,43,0.26,L005

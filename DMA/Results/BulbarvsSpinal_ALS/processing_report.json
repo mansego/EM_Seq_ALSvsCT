@@ -1,0 +1,412 @@
+{
+  "header": ["METHYLATION PROCESSING REPORT"],
+  "timestamp": ["2025-06-16 13:31:16"],
+  "parameters": {
+    "min_coverage": [10],
+    "min_samples": [4],
+    "chromosomes": ["chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22"]
+  },
+  "summary": [
+    {
+      "chromosome": "chr1",
+      "CpGs_original": 4778777,
+      "CpGs_removed_SNPs": 68675,
+      "CpGs_removed_coverage": 4687773,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 22329,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr1_filtered.rds"]
+    },
+    {
+      "chromosome": "chr1",
+      "CpGs_original": 4778777,
+      "CpGs_removed_SNPs": 68675,
+      "CpGs_removed_coverage": 4687773,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 22329,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr1_filtered.rds"]
+    },
+    {
+      "chromosome": "chr2",
+      "CpGs_original": 4433084,
+      "CpGs_removed_SNPs": 68677,
+      "CpGs_removed_coverage": 4359099,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 5308,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr2_filtered.rds"]
+    },
+    {
+      "chromosome": "chr2",
+      "CpGs_original": 4433084,
+      "CpGs_removed_SNPs": 68677,
+      "CpGs_removed_coverage": 4359099,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 5308,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr2_filtered.rds"]
+    },
+    {
+      "chromosome": "chr3",
+      "CpGs_original": 3367538,
+      "CpGs_removed_SNPs": 56479,
+      "CpGs_removed_coverage": 3309396,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1663,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr3_filtered.rds"]
+    },
+    {
+      "chromosome": "chr3",
+      "CpGs_original": 3367538,
+      "CpGs_removed_SNPs": 56479,
+      "CpGs_removed_coverage": 3309396,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1663,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr3_filtered.rds"]
+    },
+    {
+      "chromosome": "chr4",
+      "CpGs_original": 3023488,
+      "CpGs_removed_SNPs": 58536,
+      "CpGs_removed_coverage": 2963366,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1586,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr4_filtered.rds"]
+    },
+    {
+      "chromosome": "chr4",
+      "CpGs_original": 3023488,
+      "CpGs_removed_SNPs": 58536,
+      "CpGs_removed_coverage": 2963366,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1586,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr4_filtered.rds"]
+    },
+    {
+      "chromosome": "chr5",
+      "CpGs_original": 3063218,
+      "CpGs_removed_SNPs": 51648,
+      "CpGs_removed_coverage": 3009097,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 2473,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr5_filtered.rds"]
+    },
+    {
+      "chromosome": "chr5",
+      "CpGs_original": 3063218,
+      "CpGs_removed_SNPs": 51648,
+      "CpGs_removed_coverage": 3009097,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 2473,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr5_filtered.rds"]
+    },
+    {
+      "chromosome": "chr6",
+      "CpGs_original": 3051008,
+      "CpGs_removed_SNPs": 55574,
+      "CpGs_removed_coverage": 2993933,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1501,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr6_filtered.rds"]
+    },
+    {
+      "chromosome": "chr6",
+      "CpGs_original": 3051008,
+      "CpGs_removed_SNPs": 55574,
+      "CpGs_removed_coverage": 2993933,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1501,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr6_filtered.rds"]
+    },
+    {
+      "chromosome": "chr7",
+      "CpGs_original": 3256949,
+      "CpGs_removed_SNPs": 51080,
+      "CpGs_removed_coverage": 3203996,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1873,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr7_filtered.rds"]
+    },
+    {
+      "chromosome": "chr7",
+      "CpGs_original": 3256949,
+      "CpGs_removed_SNPs": 51080,
+      "CpGs_removed_coverage": 3203996,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1873,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr7_filtered.rds"]
+    },
+    {
+      "chromosome": "chr8",
+      "CpGs_original": 2684760,
+      "CpGs_removed_SNPs": 44410,
+      "CpGs_removed_coverage": 2638326,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 2024,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr8_filtered.rds"]
+    },
+    {
+      "chromosome": "chr8",
+      "CpGs_original": 2684760,
+      "CpGs_removed_SNPs": 44410,
+      "CpGs_removed_coverage": 2638326,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 2024,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr8_filtered.rds"]
+    },
+    {
+      "chromosome": "chr9",
+      "CpGs_original": 2510104,
+      "CpGs_removed_SNPs": 36597,
+      "CpGs_removed_coverage": 2470075,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 3432,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr9_filtered.rds"]
+    },
+    {
+      "chromosome": "chr9",
+      "CpGs_original": 2510104,
+      "CpGs_removed_SNPs": 36597,
+      "CpGs_removed_coverage": 2470075,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 3432,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr9_filtered.rds"]
+    },
+    {
+      "chromosome": "chr10",
+      "CpGs_original": 2772658,
+      "CpGs_removed_SNPs": 45668,
+      "CpGs_removed_coverage": 2722711,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 4279,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr10_filtered.rds"]
+    },
+    {
+      "chromosome": "chr10",
+      "CpGs_original": 2772658,
+      "CpGs_removed_SNPs": 45668,
+      "CpGs_removed_coverage": 2722711,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 4279,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr10_filtered.rds"]
+    },
+    {
+      "chromosome": "chr11",
+      "CpGs_original": 2691933,
+      "CpGs_removed_SNPs": 41733,
+      "CpGs_removed_coverage": 2648573,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1627,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr11_filtered.rds"]
+    },
+    {
+      "chromosome": "chr11",
+      "CpGs_original": 2691933,
+      "CpGs_removed_SNPs": 41733,
+      "CpGs_removed_coverage": 2648573,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1627,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr11_filtered.rds"]
+    },
+    {
+      "chromosome": "chr12",
+      "CpGs_original": 2660050,
+      "CpGs_removed_SNPs": 41595,
+      "CpGs_removed_coverage": 2617348,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1107,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr12_filtered.rds"]
+    },
+    {
+      "chromosome": "chr12",
+      "CpGs_original": 2660050,
+      "CpGs_removed_SNPs": 41595,
+      "CpGs_removed_coverage": 2617348,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1107,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr12_filtered.rds"]
+    },
+    {
+      "chromosome": "chr13",
+      "CpGs_original": 1701125,
+      "CpGs_removed_SNPs": 29217,
+      "CpGs_removed_coverage": 1670084,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1824,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr13_filtered.rds"]
+    },
+    {
+      "chromosome": "chr13",
+      "CpGs_original": 1701125,
+      "CpGs_removed_SNPs": 29217,
+      "CpGs_removed_coverage": 1670084,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1824,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr13_filtered.rds"]
+    },
+    {
+      "chromosome": "chr14",
+      "CpGs_original": 1746052,
+      "CpGs_removed_SNPs": 27701,
+      "CpGs_removed_coverage": 1717406,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 945,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr14_filtered.rds"]
+    },
+    {
+      "chromosome": "chr14",
+      "CpGs_original": 1746052,
+      "CpGs_removed_SNPs": 27701,
+      "CpGs_removed_coverage": 1717406,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 945,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr14_filtered.rds"]
+    },
+    {
+      "chromosome": "chr15",
+      "CpGs_original": 1786999,
+      "CpGs_removed_SNPs": 26172,
+      "CpGs_removed_coverage": 1758941,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1886,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr15_filtered.rds"]
+    },
+    {
+      "chromosome": "chr15",
+      "CpGs_original": 1786999,
+      "CpGs_removed_SNPs": 26172,
+      "CpGs_removed_coverage": 1758941,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1886,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr15_filtered.rds"]
+    },
+    {
+      "chromosome": "chr16",
+      "CpGs_original": 2277248,
+      "CpGs_removed_SNPs": 28930,
+      "CpGs_removed_coverage": 2242523,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 5795,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr16_filtered.rds"]
+    },
+    {
+      "chromosome": "chr16",
+      "CpGs_original": 2277248,
+      "CpGs_removed_SNPs": 28930,
+      "CpGs_removed_coverage": 2242523,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 5795,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr16_filtered.rds"]
+    },
+    {
+      "chromosome": "chr17",
+      "CpGs_original": 2412307,
+      "CpGs_removed_SNPs": 28645,
+      "CpGs_removed_coverage": 2380413,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 3249,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr17_filtered.rds"]
+    },
+    {
+      "chromosome": "chr17",
+      "CpGs_original": 2412307,
+      "CpGs_removed_SNPs": 28645,
+      "CpGs_removed_coverage": 2380413,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 3249,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr17_filtered.rds"]
+    },
+    {
+      "chromosome": "chr18",
+      "CpGs_original": 1503690,
+      "CpGs_removed_SNPs": 24174,
+      "CpGs_removed_coverage": 1479045,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 471,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr18_filtered.rds"]
+    },
+    {
+      "chromosome": "chr18",
+      "CpGs_original": 1503690,
+      "CpGs_removed_SNPs": 24174,
+      "CpGs_removed_coverage": 1479045,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 471,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr18_filtered.rds"]
+    },
+    {
+      "chromosome": "chr19",
+      "CpGs_original": 2121952,
+      "CpGs_removed_SNPs": 26092,
+      "CpGs_removed_coverage": 2094053,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1807,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr19_filtered.rds"]
+    },
+    {
+      "chromosome": "chr19",
+      "CpGs_original": 2121952,
+      "CpGs_removed_SNPs": 26092,
+      "CpGs_removed_coverage": 2094053,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 1807,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr19_filtered.rds"]
+    },
+    {
+      "chromosome": "chr20",
+      "CpGs_original": 1547693,
+      "CpGs_removed_SNPs": 21607,
+      "CpGs_removed_coverage": 1523697,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 2389,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr20_filtered.rds"]
+    },
+    {
+      "chromosome": "chr20",
+      "CpGs_original": 1547693,
+      "CpGs_removed_SNPs": 21607,
+      "CpGs_removed_coverage": 1523697,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 2389,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr20_filtered.rds"]
+    },
+    {
+      "chromosome": "chr21",
+      "CpGs_original": 816156,
+      "CpGs_removed_SNPs": 13765,
+      "CpGs_removed_coverage": 795852,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 6539,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr21_filtered.rds"]
+    },
+    {
+      "chromosome": "chr21",
+      "CpGs_original": 816156,
+      "CpGs_removed_SNPs": 13765,
+      "CpGs_removed_coverage": 795852,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 6539,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr21_filtered.rds"]
+    },
+    {
+      "chromosome": "chr22",
+      "CpGs_original": 1204560,
+      "CpGs_removed_SNPs": 15547,
+      "CpGs_removed_coverage": 1185256,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 3757,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/bsseq_chr22_filtered.rds"]
+    },
+    {
+      "chromosome": "chr22",
+      "CpGs_original": 1204560,
+      "CpGs_removed_SNPs": 15547,
+      "CpGs_removed_coverage": 1185256,
+      "CpGs_removed_nonfinite": 0,
+      "CpGs_remaining": 3757,
+      "files": ["/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset/dmlTest_chr22_filtered.rds"]
+    }
+  ],
+  "totals": {
+    "total_CpGs_original": [110822698],
+    "total_CpGs_remaining": [155728],
+    "retention_rate": [0.14]
+  }
+}
