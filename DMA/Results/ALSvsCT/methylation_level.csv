@@ -1,0 +1,17 @@
+Sample,Condition,Methylation,ALS_Phenotype
+ALS42,ALS,68.8,Bulbar
+CT44,Control,68.9,
+ALS45,ALS,68.9,Bulbar
+ALS47,ALS,67.9,Spinal
+CT48,Control,67.0
+ALS50,ALS,68.2,Bulbar
+CT52,Control,67.9,
+ALS53,ALS,68.1,Spinal
+CT55,Control,67.3,
+ALS56,ALS,67.4,Bulbar
+CT57,Control,66.5,
+ALS58,ALS,67.5,Spinal
+CT59,Control,67.1,
+CT61,Control,68.4,
+CT64,Control,69.3,
+ALS65,ALS,69.3,Spinal
