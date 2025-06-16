@@ -3,16 +3,16 @@
 title: "cfDNA Fragmentation Analysis in ALS and Control Plasma Samples"
 author: "ML Mansego"
 output:
-  pdf_document:
-    toc: true
-    toc_depth: '2'
-    latex_engine: xelatex
   html_document:
     toc: true
     toc_depth: 2
     number_sections: true
     code_folding: hide
     theme: readable
+  pdf_document:
+    toc: true
+    toc_depth: '2'
+    latex_engine: xelatex
 ---
 
 # Introduction
@@ -166,7 +166,7 @@ plot_nuc_type_scaled <- function(nuc_type) {
     labs(
       title = paste0(nuc_type, "-nucleosome"),
       x = NULL,
-      y = "Fragment Count (x10^4)"
+      y = "Fragment Count (×10⁴)"
     ) +
     scale_fill_brewer(palette = "Set1") +
     theme_minimal(base_size = 14) +
@@ -433,7 +433,7 @@ plot_nuc_type_scaled <- function(nuc_type) {
     labs(
       title = paste0(nuc_type, "-nucleosome"),
       x = NULL,
-      y = "Fragment Count (x10^4)"
+      y = "Fragment Count (×10⁴)"
     ) +
     scale_fill_brewer(palette = "Set1") +
     theme_minimal(base_size = 14) +
