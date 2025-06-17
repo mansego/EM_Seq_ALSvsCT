@@ -36,8 +36,8 @@ config <- list(
 )
 
 # Create directories if they don't exist
-dir.create(config$work_dir, showWarnings = FALSE, recursive = TRUE)
-dir.create(config$output_dir, showWarnings = FALSE, recursive = TRUE)
+#dir.create(config$work_dir, showWarnings = FALSE, recursive = TRUE)
+#dir.create(config$output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Sample metadata
 sample_meta <- read.csv("/mnt/mydisk/EM_Seq_ALSvsCT/pData/pData_ALSvsCT.csv", stringsAsFactors = FALSE) %>%
@@ -468,7 +468,7 @@ p_pca<-ggplot(pca_df, aes(PC1, PC2, color = Group)) +
   stat_ellipse(aes(group = Group), type = "norm", linetype = 2, linewidth = 1, level = 0.95) +
   geom_point(size = 4, alpha = 0.7) +
   geom_text_repel(aes(label = Sample), size = 3, max.overlaps = 20, show.legend = FALSE) +
-  scale_color_brewer(palette = "Set2") +
+  scale_color_manual(values = c("Bulbar" = "#7CAE00", "Spinal" = "#C77CFF"))+
   labs(
     title = "PCA of Methylation Profiles (ALS: Bulbar vs Spinal) ",
     x = sprintf("PC1 (%.1f%% variance)", 100 * summary(pca)$importance[2, 1]),

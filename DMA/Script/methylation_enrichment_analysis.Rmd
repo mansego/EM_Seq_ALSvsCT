@@ -36,7 +36,7 @@ library(stringr)
 
 ```{r}
 # Load files
-setwd("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/")
+setwd("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/Results/BulbarvsSpinal_ALS/")
 dmls <- read_tsv("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/DMLs_annotated.tsv")
 dmrs <- read_tsv("/mnt/mydisk/EM_Seq_ALSvsCT/DMA/DSS/Results/DMRs_annotated.tsv")
 

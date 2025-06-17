@@ -8,7 +8,7 @@
 required_packages <- c(
   "DSS", "bsseq", "annotatr", "pheatmap", "GenomicRanges",
   "data.table", "parallel", "magrittr", "dplyr", "ggplot2", 
-  "stringr", "qvalue", "patchwork","ggpubr","limma","ggrepel"
+  "stringr", "qvalue", "patchwork","ggpubr","limma","ggrepel","cowplot"
 )
 
 invisible({
@@ -443,28 +443,34 @@ p_density <- ggplot(meth_melted, aes(x = Beta, color = Group)) +
 ggsave(file.path(config$output_dir, "QC_global_methylation_density.png"), p_density)
 
 # 4.3.2. Principal component analysis (PCA)
-Mvals <- log2(meth / (1 - meth))
-Mvals_clean <- Mvals[rowSums(is.infinite(Mvals)) == 0, ]
-pca <- prcomp(t(Mvals_clean), scale. = TRUE)
 
-# Convert to dataframe for plotting
+Mvals <- log2(meth / (1 - meth))
+Mvalues_clean <- Mvals[
+  rowSds(Mvalues, na.rm = TRUE) > 0 & is.finite(rowSds(Mvalues, na.rm = TRUE)),
+  colSds(Mvalues, na.rm = TRUE) > 0
+]
+pca_result <- prcomp(t(Mvalues_clean), scale. = TRUE)
 pca_df <- data.frame(
-  PC1 = pca$x[, 1],
-  PC2 = pca$x[, 2],
-  Group = sample_meta$group[match(colnames(Mvals_clean), sample_meta$name)],
-  Sample = colnames(Mvals_clean))
+  Sample = colnames(Mvalues_clean),
+  Group = sample_meta$group[match(colnames(Mvalues_clean), sample_meta$name)],
+  PC1 = pca_result$x[, 1],
+  PC2 = pca_result$x[, 2]
+)
 
 # Plot with ggplot2
 p_pca <- ggplot(pca_df, aes(x = PC1, y = PC2)) +
-  stat_ellipse(aes(group = Group, color = Group),type = "norm",linetype = 2,linewidth = 1,show.legend = FALSE,level=0.95) +
-  geom_point(aes(color = Group),size = 3,alpha = 0.7) +
-  geom_text_repel(aes(label = Sample, color = Group),max.overlaps = 20,size = 3,show.legend = FALSE) +
+  stat_ellipse(aes(group = Group, color = Group),
+               type = "norm", linetype = 2, linewidth = 1,
+               show.legend = FALSE, level = 0.95) +
+  geom_point(aes(color = Group), size = 3, alpha = 0.7) +
+#  geom_text_repel(aes(label = Sample, color = Group),
+#                  max.overlaps = 20, size = 3, show.legend = FALSE) +
   scale_color_brewer(palette = "Set2") +
   labs(
     title = "PCA of Methylation Profiles",
     color = "Group",
-    x = sprintf("PC1 (%.1f%% variance)", 100 * summary(pca)$importance[2, 1]),
-    y = sprintf("PC2 (%.1f%% variance)", 100 * summary(pca)$importance[2, 2])
+    x = sprintf("PC1 (%.1f%% variance)", 100 * summary(pca_result)$importance[2, 1]),
+    y = sprintf("PC2 (%.1f%% variance)", 100 * summary(pca_result)$importance[2, 2])
   ) +
   theme_minimal(base_size = 15) +
   theme(
@@ -504,7 +510,7 @@ p_cov <- ggplot(cov_by_chr, aes(x = Chr, y = Mean_Coverage)) +
 ggsave(file.path(config$output_dir, "QC_coverage_by_chr.png"), p_cov, width = 8, height = 6)
 
 # 4.3.4. Clustering samples
-library(pheatmap)
+
 cor_matrix <- cor(meth, use = "pairwise.complete.obs")
 dist_matrix <- as.dist(1 - cor_matrix)
 hc <- hclust(dist_matrix, method = "ward.D2")
@@ -521,6 +527,7 @@ global_meth <- data.frame(
   methylation = meth_avg
 ) %>%
   left_join(sample_meta, by = c("sample" = "name"))
+
 
 # Plot
 p_global <- ggplot(global_meth, aes(x = group, y = methylation, fill = group)) +
@@ -540,6 +547,25 @@ p_global <- ggplot(global_meth, aes(x = group, y = methylation, fill = group)) +
 
 ggsave(file.path(config$output_dir, "Global_Methylation_Comparison.png"),
        p_global, width = 6, height = 5, dpi = 300)
+
+### SAVE FOR MANUSCRIPT###
+supp_fig_DMA <- plot_grid(
+  p_density, p_pca,
+  p_cov, p_feature,
+  labels = c("A", "B", "C", "D"),
+  label_size = 16,
+  label_fontface = "bold",
+  label_x = 0.02,  
+  label_y = 0.98,   
+  hjust = 0,        
+  vjust = 1,       
+  ncol = 2
+)
+
+ggsave(
+  file.path(config$output_dir, "Supplementary_Figure_1.png"),
+  supp_fig_DMA, width = 12, height = 10, dpi = 300
+)
 
 # ==========================================
 # 5. CALLING AND ANNOTATION OF DMLs AND DMRs
@@ -745,7 +771,9 @@ pheatmap(dmr_scaled,
          main = "Top DMRs (mean methylation, scaled)",
          filename = file.path(config$output_dir, "Heatmap_DMRs.png"),
          width = 10, height = 10)
-      
+
+
+
 # ======================
 # 9. SESSION INFO
 # ======================
