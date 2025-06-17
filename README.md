@@ -121,6 +121,7 @@ After rigorous quality control (SNP exclusion, coverage filtering, batch correct
 |-----------|-----------------|----------------|
 |ALS vs Control|	69,749	|182|
 |Bulbar vs Spinal ALS	|233	|1|
+
 Functional enrichment (GO, KEGG, DisGeNET) highlighted neuronal and ALS-related pathways. Scripts and outputs are organized in the [`DMA/`](DMA) folder and include annotated DMLs/DMRs, volcano plots, PCA, and enrichment summaries.
 
 ## 🧬 Deconvolution of Tissue-of-Origin
