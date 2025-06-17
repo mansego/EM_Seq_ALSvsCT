@@ -32,3 +32,6 @@ fragment_analysis/raw_lengths/*.lengths.txt
 *.deduplicated.sorted.beta
 *.deduplicated.sorted.pat.gz
 *.deduplicated.sorted.pat.gz.csi
+
+.vscode/
+.venv/
