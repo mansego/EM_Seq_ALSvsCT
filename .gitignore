@@ -35,3 +35,4 @@ fragment_analysis/raw_lengths/*.lengths.txt
 
 .vscode/
 .venv/
+Deconvolution/UXM_deconv/
