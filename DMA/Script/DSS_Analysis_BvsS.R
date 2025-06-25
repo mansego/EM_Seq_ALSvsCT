@@ -29,15 +29,15 @@ invisible({
 
 # File paths
 config <- list(
-  work_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS",
+  work_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset",
   base_path = "/mnt/mydisk/EM_Seq_ALSvsCT/PrePro/bismark/methylation_call/methylation_coverage",
   snp_file = "/mnt/mydisk/EM_Seq_ALSvsCT/references/snp151Common.txt.gz",
-  output_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/Results/BulbarvsSpinal_ALS"
+  output_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/Results/BulbarvsSpinal_ALS_batch_onset"
 )
 
 # Create directories if they don't exist
-dir.create(config$work_dir, showWarnings = FALSE, recursive = TRUE)
-dir.create(config$output_dir, showWarnings = FALSE, recursive = TRUE)
+#dir.create(config$work_dir, showWarnings = FALSE, recursive = TRUE)
+#dir.create(config$output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Sample metadata
 sample_meta <- read.csv("/mnt/mydisk/EM_Seq_ALSvsCT/pData/pData_ALSvsCT.csv", stringsAsFactors = FALSE) %>%
@@ -313,19 +313,18 @@ plot_annotation_pie <- function(annot_df, title) {
 }
 
 #' Plot fold enrichment
-plot_fold_enrichment <- function(gr, annotations, bg_gr, title) {
+plot_fold_enrichment <- function(gr, annotations, title) {
   # Get observed annotations
   annot_df <- annotate_regions(regions = gr, annotations = annotations, ignore.strand = TRUE) %>% 
     as.data.frame()
+  
+  # Calculate observed percentages
   annot_table <- table(annot_df$annot.type)
   annot_pct <- annot_table / sum(annot_table)
-
-  # annotated Background 
-  bg_annot_df <- annotate_regions(regions = bg_gr, annotations = annotations, ignore.strand = TRUE) %>%
-    as.data.frame()
-  bg_annot_table <- table(bg_annot_df$annot.type)
-  feature_pct <- bg_annot_table / sum(bg_annot_table)
-
+  
+  # Calculate expected percentages based on genome-wide feature lengths
+  feature_lengths <- sapply(split(annotations, annotations$type), function(x) sum(width(x)))
+  feature_pct <- feature_lengths / sum(feature_lengths)
   
   # Calculate fold enrichment
   fold_change <- annot_pct / feature_pct[names(annot_pct)]
@@ -348,7 +347,6 @@ plot_fold_enrichment <- function(gr, annotations, bg_gr, title) {
     theme_minimal() +
     theme(axis.text.y = element_text(size = 10))
 }
-
 
 #' Summarize DML/DMR results
 summarize_regions <- function(df, diff_col, type = c("DML", "DMR")) {
@@ -432,9 +430,6 @@ bsseq_files <- list.files(pattern = "^bsseq_.*_filtered\\.rds$")
 bsseq_all <- lapply(bsseq_files, readRDS)
 bsseq_merged <- do.call(BiocGenerics::rbind, bsseq_all)
 # saveRDS(bsseq_merged, file.path(config$work_dir, "bsseq_merged_filtered.rds"))
-
-# Define background for DML enrichment (CpGs tested after filtering)
-background_gr <- granges(bsseq_merged)
 
 # 4.3.1. Global Methylation Distribution
 meth <- getMeth(bsseq_merged, type = "raw")
@@ -562,11 +557,6 @@ dmls <- callDML(dml_all, delta=0.1 , p.threshold = 0.05)
 
 # 5.2 Call DMRs
 dmrs <- do.call(callDMR, c(list(dml_all), params$dmr_params))
-# Define background for DMR enrichment (regions that could be DMRs)
-# Based on all CpGs tested (dml_all)
-gr_dml_all <- GRanges(seqnames = dml_all$chr, ranges = IRanges(start = dml_all$pos, width = 1))
-candidate_dmrs <- reduce(gr_dml_all, min.gapwidth = params$dmr_params$dis.merge)
-background_dmr_gr <- candidate_dmrs
 
 # 5.3 Annotate DMLs and DMRs
 annotations <- build_annotations("hg38", c("hg38_basicgenes", "hg38_genes_intergenic"))
@@ -637,8 +627,8 @@ dml_cpg_annot_df <- as.data.frame(annotate_regions(dml_gr, annot_cpg, ignore.str
 
 p1 <- plot_annotation_pie(dml_annot_df, "DMLs - Gene Annotation")
 p2 <- plot_annotation_pie(dml_cpg_annot_df, "DMLs - CpG Annotation")
-p3 <- plot_fold_enrichment(dml_gr, annotations, background_gr, "DMLs - Enrichment (Genes)")
-p4 <- plot_fold_enrichment(dml_gr, annot_cpg, background_gr, "DMLs - Enrichment (CpG Features)")
+p3 <- plot_fold_enrichment(dml_gr, annotations, "DMLs - Enrichment (Genes)")
+p4 <- plot_fold_enrichment(dml_gr, annot_cpg, "DMLs - Enrichment (CpG Features)")
 
 p_dml <- (p1 | p2) / (p3 | p4)
 ggsave(
@@ -652,8 +642,8 @@ dmr_cpg_annot_df <- as.data.frame(annotate_regions(dmr_gr, annot_cpg, ignore.str
 
 p5 <- plot_annotation_pie(dmr_annot_df, "DMRs - Gene Annotation")
 p6 <- plot_annotation_pie(dmr_cpg_annot_df, "DMRs - CpG Annotation")
-p7 <- plot_fold_enrichment(dmr_gr, annotations, background_dmr_gr, "DMRs - Enrichment (Genes)")
-p8 <- plot_fold_enrichment(dmr_gr, annot_cpg, background_dmr_gr, "DMRs - Enrichment (CpG Features)")
+p7 <- plot_fold_enrichment(dmr_gr, annotations, "DMRs - Enrichment (Genes)")
+p8 <- plot_fold_enrichment(dmr_gr, annot_cpg, "DMRs - Enrichment (CpG Features)")
 
 p_dmr <- (p5 | p6) / (p7 | p8)
 ggsave(
