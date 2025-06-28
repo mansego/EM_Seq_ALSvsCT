@@ -32,7 +32,7 @@ config <- list(
   work_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/RDS/Filter_batch_SNP_cov10_BvsS_batch_onset",
   base_path = "/mnt/mydisk/EM_Seq_ALSvsCT/PrePro/bismark/methylation_call/methylation_coverage",
   snp_file = "/mnt/mydisk/EM_Seq_ALSvsCT/references/snp151Common.txt.gz",
-  output_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/Results/BulbarvsSpinal_ALS_batch_onset"
+  output_dir = "/mnt/mydisk/EM_Seq_ALSvsCT/DMA/Results/BulbarvsSpinal_ALS"
 )
 
 # Create directories if they don't exist
@@ -47,7 +47,7 @@ sample_meta <- read.csv("/mnt/mydisk/EM_Seq_ALSvsCT/pData/pData_ALSvsCT.csv", st
     name = c("B42", "B45", "S47", "B50", "S53","B56", "S58", "S65"),
     group = ifelse(grepl("^B", name), "Bulbar", "Spinal"),
     group = factor(group, levels = c("Spinal", "Bulbar")),
-    cov_file = file.path(config$base_path, paste0("BACW_", id, "_1_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz"))
+    #cov_file = file.path(config$base_path, paste0("BACW_", id, "_1_val_1_bismark_bt2_pe.deduplicated.bismark.cov.gz"))
   )
 
 # Analysis parameters
@@ -676,81 +676,64 @@ ggsave(
 # Select top 100 DMLs by FDR
 top_dmls <- dmls_annot %>%
   arrange(fdr, desc(abs(diff))) %>%
-  head(100)
-top_gr <- GRanges(seqnames = top_dmls$chr, ranges = IRanges(top_dmls$pos, width = 1))
+  head(50)
 
-# Extract methylation matrix
+# 2. Create GRanges object from DML positions
+top_gr <- GRanges(seqnames = top_dmls$chr,
+                  ranges = IRanges(top_dmls$pos, width = 1))
+
+# 3. Subset methylation matrix for these positions
 bsseq_subset <- subsetByOverlaps(bsseq_merged, top_gr)
 meth_top <- getMeth(bsseq_subset, type = "raw")
+
+# 4. Match rows between methylation matrix and top DMLs
 row_ids <- paste0(seqnames(granges(bsseq_subset)), ":", start(granges(bsseq_subset)))
 target_ids <- paste0(top_dmls$chr, ":", top_dmls$pos)
 meth_top <- meth_top[match(target_ids, row_ids, nomatch = NA), ]
 
+# 5. Scale methylation values and reorder samples by group
 sample_order <- sample_meta %>%
   arrange(group) %>%
   pull(name)
 
-# Scale rows
 meth_scaled <- t(scale(t(meth_top), center = TRUE, scale = TRUE))
 meth_scaled <- meth_scaled[complete.cases(meth_scaled), ]
 meth_scaled <- meth_scaled[, sample_order]
 
+# 6. Clean gene names or replace with coordinates if missing
+gene_names <- top_dmls$annot.symbol
+
+# If multiple names separated by ';', take the first valid one
+gene_names <- sapply(strsplit(as.character(gene_names), ";"), function(x) {
+  first_valid <- x[!is.na(x) & x != "NA"]
+  if (length(first_valid) == 0) return(NA) else return(first_valid[1])
+})
+
+# Replace missing names with genomic coordinates
+missing_genes <- is.na(gene_names) | gene_names == ""
+gene_names[missing_genes] <- paste0(top_dmls$chr[missing_genes], ":", top_dmls$pos[missing_genes])
+
+# Ensure unique row names
+gene_names <- make.unique(gene_names)
+
+# Set gene names as row names
+rownames(meth_scaled) <- gene_names
+
+# 7. Define column annotation (sample groups)
 annotation_col <- data.frame(Group = sample_meta$group)
 rownames(annotation_col) <- sample_meta$name
 annotation_col <- annotation_col[sample_order, , drop = FALSE]
 
-# Heatmap
+# 8. Generate heatmap
 pheatmap(meth_scaled,
          cluster_rows = TRUE,
          cluster_cols = FALSE,
          annotation_col = annotation_col,
-         main = "Top 100 DMLs (scaled methylation)",
+         main = "Top 50 DMLs (scaled methylation)",
          filename = file.path(config$output_dir, "Heatmap_DMLs.png"),
-         width = 10, height = 10)
-
-       
-# ======================
-# 8. HEATMAP OF DMRs
-# ======================
-
-# Select top 100 DMRs by FDR
-top_dmrs <- dmrs_annot %>% arrange(fdr) %>% head(100)
-
-# Function to compute mean methylation per region
-get_dmr_meth <- function(region, bsseq) {
-  gr <- GRanges(seqnames = region$chr,
-                ranges = IRanges(as.numeric(region$start), as.numeric(region$end)))
-  
-  bsseq_sub <- subsetByOverlaps(bsseq, gr)
-  meth <- getMeth(bsseq_sub, type = "raw")
-  
-  if (nrow(meth) == 0) return(rep(NA, ncol(bsseq)))
-  
-  colMeans(meth, na.rm = TRUE)
-}
-
-dmr_matrix_list <- lapply(seq_len(nrow(dmrs_annot)), function(i) {
-  get_dmr_meth(dmrs_annot[i, ], bsseq = bsseq_merged)
-})
-
-# Combine into matrix
-dmr_matrix <- do.call(rbind, dmr_matrix_list)
-rownames(dmr_matrix) <- paste0(dmrs_annot$chr, ":", dmrs_annot$start, "-", dmrs_annot$end)
-
-# Optional: filter out rows with NA (e.g. DMRs without coverage)
-dmr_matrix <- dmr_matrix[complete.cases(dmr_matrix), ]
-
-# Scale rows
-dmr_scaled <- t(scale(t(dmr_matrix), center = TRUE, scale = TRUE))
-
-# Heatmap
-pheatmap(dmr_scaled,
-         cluster_rows = TRUE,
-         cluster_cols = TRUE,
-         annotation_col = annotation_col,
-         main = "Top DMRs (mean methylation, scaled)",
-         filename = file.path(config$output_dir, "Heatmap_DMRs.png"),
-         width = 10, height = 10)
+         width = 10, height = 10,
+         show_rownames = TRUE,
+         fontsize_row = 8)
       
 # ======================
 # 9. SESSION INFO
